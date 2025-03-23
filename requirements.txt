@@ -1,0 +1,17 @@
+openai
+selenium
+undetected-chromedriver
+beautifulsoup4
+requests
+newspaper3k
+pydantic
+psycopg2-binary
+Flask
+lxml
+python-dotenv
+jinja2
+gunicorn
+newspaper3k
+lxml_html_clean
+python-dateutil
+

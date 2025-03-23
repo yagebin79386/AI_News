@@ -1,0 +1,499 @@
+
+        <html lang="en">
+        <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Newsletter</title>
+        <style type="text/css">
+            /* Default Style */
+            .top-news-header {
+                text-align: center;
+                color: #34C759;
+                font-family: 'Titan One', sans-serif;
+                font-size: 28px;
+                letter-spacing: 2px;
+                margin-bottom: 10px;
+            }
+            .logo-container {
+                text-align: center;
+                margin-bottom: 10px;
+            }
+            .company-logo-img {
+                display: block;
+                width: 140px;
+                max-width: 140px;
+                height: auto;
+                margin: 0 auto;
+            }
+            .contact-container {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 15px;
+                margin: 20px 0;
+            }
+            .contact-item {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+            .contact-icon {
+                width: 20px;
+                height: 20px;
+            }
+            .contact-text {
+                font-size: 14px;
+            }
+            .subscribe-container {
+                text-align: center;
+                font-size: 14px;
+                font-style: italic;
+                color: #666;
+                margin: 25px 0;
+            }
+            .footer-container {
+                text-align: center;
+                font-size: 12px;
+                color: #666;
+                margin-top: 20px;
+                line-height: 1.4;
+            }
+
+            /* Mobile Styles */
+            @media only screen and (max-width: 600px) {
+            /* Keep your layout the same; do NOT force the main table to width:100% */
+            /* Only override fonts for head-container and main-container */
+            .top-news-header {
+                font-size: 36px !important;  
+            }
+            .company-logo-img {
+                width: 150px !important;
+                max-width: 150px !important;
+            }
+            .contact-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .contact-text {
+                font-size: 20px !important;
+            }
+            .contact-icon {
+                width: 30px;
+                height: 30px;
+            }
+            .subscribe-container {
+                font-size: 20px !important;
+            }
+            .footer-container {
+                font-size: 18px !important;
+            }
+            .head-container * {
+                /* +4px from your original, adjust as needed */
+                font-size: 26px;
+            }
+            .main-container * {    
+                font-size: 26px !important; /* Consistent font size for main container */
+            }
+            .newsletter_title {
+                font-size: 36px !important;
+                margin:0 30px 20px 30px !important;
+            }
+            .newsletter_intro {
+                font-size: 28px !important;
+            }
+            .article-title {
+                font-size: 32px !important;
+            }
+            .article-summary { 
+                font-size: 26px !important; /* Example addition for article summary styling */
+            }
+            .top-news-title { 
+                font-size: 32px !important; /* Example addition for top news title styling */
+            }
+            .top-news-text {
+                font-size: 26px !important; /* Example addition for top news text styling */
+            }
+            .newsletter { 
+                font-size: 45px !important; /* Example addition for newsletter styling */
+            }
+            .issue-info-block * {
+                font-size: 26px !important; 
+            }
+            /* Enlarge images by 50% (width) within .issue-info-block */
+            .issue-info-block img {
+                width: 40px !important; 
+                height: auto !important; /* maintain aspect ratio */
+            }
+        }
+        </style>
+        </head>
+        <body style="margin:0; padding:0; background:linear-gradient(135deg, #add8e6, #ffffe0); font-family:Arial, sans-serif;">
+
+        <!-- Outer table for full width background -->
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" align="center" style="background: linear-gradient(135deg, #add8e6, #ffffe0);">
+            <tr>
+            <td align="center" valign="top">
+
+                <!-- Nested table to constrain width & center the newsletter -->
+                <table width="600" border="0" cellspacing="0" cellpadding="0" align="center" style="border-spacing:0; border-collapse:collapse;">
+                <tr>
+                    <td align="center" valign="top" style="padding:20px;">
+
+                    <!-- HEAD Container -->
+                    <table class="head-container" width="100%" border="0" cellspacing="0" cellpadding="0" align="center"
+                            style="background: rgba(255,255,255,0.3); border-radius:12px; margin-bottom:20px;">
+                        <tr>
+                        <td style="padding:20px;">
+                            
+        <!-- HEAD Area Table -->
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" 
+            style="background: rgba(255,255,255,0.0); border-radius:12px;">
+        <!-- Top row: Issue info (left) and share buttons (right) -->
+        <tr class="issue-info-block">
+            <td align="left" style="font-family: 'Roboto Condensed', sans-serif; font-size: 13px; color: #555; padding:0 0 20px 0;">
+            Issue No.1 Edition 1<br>
+            Current Date: 2025-03-23
+            </td>
+            <td align="right" style="vertical-align:top;">
+            <table border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                <!-- Twitter Share Button -->
+                <td align="center" style="padding:5px;">
+                    <a href="https://twitter.com/intent/tweet?url=YOUR_URL&text=Check%20this%20out!" 
+                    target="_blank" style="text-decoration:none; color:#333;">
+                    <img src="cid:twitter_icon" alt="Twitter" style="width:20px; height:20px;">
+                    <span style="font-family:Arial, sans-serif; font-size:12px;">Twitter</span>
+                    </a>
+                </td>
+                <!-- Copy Link Button -->
+                <td align="center" style="padding:5px;">
+                    <a href="YOUR_URL" target="_blank" style="text-decoration:none; color:#333;">
+                    <img src="cid:copylink_icon" alt="Copy Link" style="width:23px; height:23px;">
+                    <span style="font-family:Arial, sans-serif; font-size:12px;">Copy Link</span>
+                    </a>
+                </td>
+                <!-- WhatsApp Share Button -->
+                <td align="center" style="padding:5px;">
+                    <a href="https://api.whatsapp.com/send?text=YOUR_URL" target="_blank" style="text-decoration:none; color:#333;">
+                    <img src="cid:whatsapp_icon" alt="WhatsApp" style="width:20px; height:20px;">
+                    <span style="font-family:Arial, sans-serif; font-size:12px;">WhatsApp</span>
+                    </a>
+                </td>
+                </tr>
+            </table>
+            </td>
+        </tr>
+        <!-- Second row: Newsletter title -->
+        <tr>
+            <td class="newsletter" colspan="2" align="center" 
+                style="font-family: 'Titan+One', sans-serif; letter-spacing: 2px; font-size:38px; color:#007AFF; text-transform:uppercase; padding:20px 0;">
+            DEEPTECH DIGEST
+            </td>
+        </tr>
+        </table>
+        
+                        </td>
+                        </tr>
+                    </table>
+
+                    <!-- MAIN Container -->
+                    <table class="main-container" width="100%" border="0" cellspacing="0" cellpadding="0" align="center"
+                            style="background: rgba(255,255,255,0.3); border-radius:12px; margin-bottom:20px;">
+                        <tr>
+                        <td style="padding:20px;">
+                            
+        <div style="margin-bottom:20px;">
+        <h2 class="newsletter_title" style="
+            display:block;
+            font-family:'Poppins', sans-serif;
+            font-size:22px; 
+            color:#007AFF; 
+            margin:0 auto 20px auto; 
+            text-align:center; 
+            max-width:600px;
+        ">
+            AI Adventures: Yahoo's Revival, Intelligence Explosions, and Data Management Insights
+        </h2>
+        <p class="newsletter_intro" style="
+            font-size:16px;
+            font-family:'Nunito', sans-serif;
+            color:#333; 
+            margin:0 30px 40px 30px; 
+            max-width:700px; 
+            text-align:left;
+        ">
+            Hey there, tech aficionados! Welcome to our latest edition of the newsletter, where we dive into the fascinating world of artificial intelligence and its evolving landscape. From Yahoo's ambitious AI plans to the looming prospect of intelligence explosions, we have a lineup that will spark your curiosity and fuel your imagination. Join us as we explore how legacy tech giants are adapting, the potential for AI to surpass human intelligence, and the critical role of data management in our digital lives.
+        </p>
+        </div>
+        
+                            <hr style="border:none; border-top:2px solid #5AC8FA; margin:20px 0;">
+                            
+        <div style="margin:0 20px; padding:10px;">
+        <h3 class="article-title" style="
+            font-size:20px;
+            font-family:'Poppins', sans-serif;
+            color:#34AADC; 
+            margin:10px 35px 10px 35px; 
+            text-align:center;
+        ">
+            Inside Google’s Two-Year Frenzy to Catch Up With OpenAI
+        </h3>
+        <p class="publication-date" style="
+            font-size:14px;
+            font-family:'Nunito', sans-serif;
+            color:#999;
+            text-align:center;
+            margin-bottom:10px;
+        ">
+            2025-03-21
+        </p>
+        <p class="article-summary" style="
+            font-family:'Nunito', sans-serif;
+            font-size:14px; 
+            color:#333333; 
+            margin-bottom:20px; 
+            text-align:left;
+        ">
+            In the competitive landscape of AI, Google is striving to monetize its Gemini app amidst a backdrop of intense competition and financial pressures. Despite having fewer app installs compared to OpenAI's ChatGPT, Google is exploring ad-based revenue models while grappling with potential antitrust revenue losses. The tech giant is also racing to develop advanced AI capabilities, such as agentic AI, to keep pace with rivals. As the industry invests heavily in generative AI, the challenge remains to achieve profitability and sustainability, with Google executives emphasizing cautious advancement to avoid past missteps.
+        </p>
+        <div style="text-align:center;">
+            <a href="https://www.wired.com/story/google-openai-gemini-chatgpt-artificial-intelligence/" target="_blank" style="text-decoration:none;">
+            <button style="
+                padding:6px 12px; 
+                background:#007AFF; 
+                color:#ffffff; 
+                border:none; 
+                border-radius:20px; 
+                cursor:pointer;
+                font-size:12px;
+            ">
+                READ MORE (4 mins)
+            </button>
+            </a>
+        </div>
+        </div>
+        
+        <div style="margin:0 20px; padding:10px;">
+        <h3 class="article-title" style="
+            font-size:20px;
+            font-family:'Poppins', sans-serif;
+            color:#34AADC; 
+            margin:10px 35px 10px 35px; 
+            text-align:center;
+        ">
+            Are we close to an intelligence explosion?
+        </h3>
+        <p class="publication-date" style="
+            font-size:14px;
+            font-family:'Nunito', sans-serif;
+            color:#999;
+            text-align:center;
+            margin-bottom:10px;
+        ">
+            2025-03-21
+        </p>
+        <p class="article-summary" style="
+            font-family:'Nunito', sans-serif;
+            font-size:14px; 
+            color:#333333; 
+            margin-bottom:20px; 
+            text-align:left;
+        ">
+            The concept of an intelligence explosion, where AI surpasses human intelligence and enters a phase of rapid self-improvement, is gaining traction among tech leaders and researchers. Figures like Sam Altman of OpenAI and pioneers Geoffrey Hinton and Yoshua Bengio suggest that superintelligence could be just a few years away. This potential leap in AI capabilities raises both hopes and fears: while it could revolutionize fields like medicine and climate science, it also poses existential risks if not properly controlled. The debate continues on whether this future is imminent and how society should prepare for such transformative technological advancements.
+        </p>
+        <div style="text-align:center;">
+            <a href="https://futureoflife.org/ai/are-we-close-to-an-intelligence-explosion/" target="_blank" style="text-decoration:none;">
+            <button style="
+                padding:6px 12px; 
+                background:#007AFF; 
+                color:#ffffff; 
+                border:none; 
+                border-radius:20px; 
+                cursor:pointer;
+                font-size:12px;
+            ">
+                READ MORE (19 mins)
+            </button>
+            </a>
+        </div>
+        </div>
+        
+        <div style="margin:0 20px; padding:10px;">
+        <h3 class="article-title" style="
+            font-size:20px;
+            font-family:'Poppins', sans-serif;
+            color:#34AADC; 
+            margin:10px 35px 10px 35px; 
+            text-align:center;
+        ">
+            Special: Defeating AI Defenses (with Nicholas Carlini and Nathan Labenz)
+        </h3>
+        <p class="publication-date" style="
+            font-size:14px;
+            font-family:'Nunito', sans-serif;
+            color:#999;
+            text-align:center;
+            margin-bottom:10px;
+        ">
+            2025-03-21
+        </p>
+        <p class="article-summary" style="
+            font-family:'Nunito', sans-serif;
+            font-size:14px; 
+            color:#333333; 
+            margin-bottom:20px; 
+            text-align:left;
+        ">
+            The article discusses the critical role of technical storage and access in enabling specific services and communication over electronic networks. It highlights the necessity of these technologies for storing user preferences and gathering statistics, which are essential for enhancing user experience and service delivery. This topic is particularly relevant as it underscores the importance of data management and privacy in our increasingly digital lives, impacting how services are tailored and delivered to users.
+        </p>
+        <div style="text-align:center;">
+            <a href="https://futureoflife.org/podcast/special-defeating-ai-defenses-with-nicholas-carlini-and-nathan-labenz/" target="_blank" style="text-decoration:none;">
+            <button style="
+                padding:6px 12px; 
+                background:#007AFF; 
+                color:#ffffff; 
+                border:none; 
+                border-radius:20px; 
+                cursor:pointer;
+                font-size:12px;
+            ">
+                READ MORE (1 mins)
+            </button>
+            </a>
+        </div>
+        </div>
+        
+                            <hr style="border:none; border-top:2px solid #5AC8FA; margin:40px 0;">
+                            
+        <div class="top-news-header">
+            TOP NEWS!
+        </div>
+        
+                            
+        <div style="margin:0 20px 30px 20px; padding:10px;">
+        <h3 class="top-news-title" style="
+            font-family:'Poppins', sans-serif;
+            font-size:20px; 
+            color:#34AADC; 
+            margin:0 35px 12px 35px; 
+            text-align:center;
+        ">
+            Yahoo Is Still Here—and It Has Big Plans for AI
+        </h3>
+        <p class="publication-date" style="
+            font-size:14px;
+            font-family:'Nunito', sans-serif;
+            color:#999;
+            text-align:center;
+            margin-bottom:10px;
+        ">
+            2025-03-21
+        </p>
+        <p class="top-news-text" style="
+            font-family:'Nunito', sans-serif; 
+            font-size:14px; 
+            color:#333333; 
+            margin-bottom:20px; 
+            text-align:left;
+        ">
+            For the top news of this edition, Yahoo has big plans for AI under new CEO Jim Lanzone. Despite Yahoo's history of missed opportunities and past blunders, Lanzone is focused on turning the company around by improving existing operations and making strategic acquisitions. With a strong focus on AI, Yahoo has acquired Artifact, an AI-powered news aggregator, and partnered with Sierra for robot customer service agents. Lanzone's vision for Yahoo includes utilizing machine learning talent and outside technology to seize the moment in the rapidly evolving tech landscape. This move towards AI integration could help Yahoo regain its former glory and remain a significant player in the tech industry.
+        </p>
+        <div style="text-align:center;">
+            <a href="https://www.wired.com/story/plaintext-yahoo-turns-30-jim-lanzone/" target="_blank" style="text-decoration:none;">
+            <button style="
+                padding:6px 12px; 
+                background:#007AFF; 
+                color:#fff; 
+                border:none; 
+                border-radius:20px; 
+                cursor:pointer;
+                font-size:12px;
+            ">
+                READ MORE (5 mins)
+            </button>
+            </a>
+        </div>
+        </div>
+        
+                            
+        <div style="text-align:center; margin-top:20px;">
+        <p style="font-size:14px; font-family:'Poppins', sans-serif; color:#333; margin-bottom:10px;">
+            Feel free to visit our website for more news and smart technologies possibilities!
+        </p>
+        <a href="https://www.homesmartify.lu" target="_blank" style="text-decoration:none;">
+            <button style="
+                padding:8px 16px; 
+                background:#007AFF; 
+                color:#fff; 
+                border:none; 
+                border-radius:20px; 
+                cursor:pointer; 
+                font-family:'Titan One', monospace; 
+                text-transform:uppercase; 
+                font-size:14px;
+            ">
+                Explore More
+            </button>
+        </a>
+        </div>
+        
+                        </td>
+                        </tr>
+                    </table>
+
+                    <!-- TAIL Container -->
+                    <table class="tail-container" width="100%" border="0" cellspacing="0" cellpadding="0" align="center"
+                            style="background: rgba(255,255,255,0.3); border-radius:12px;">
+                        <tr>
+                        <td style="padding:20px;">
+                            
+        <div class="logo-container">
+        <img src="cid:company_logo" alt="Company Logo" class="company-logo-img">
+        </div>
+        
+                            
+        <div class="contact-container">
+        <div class="contact-item">
+            <img src="cid:phone_icon" alt="Phone" class="contact-icon">
+            <span class="contact-text">+352 661777082</span>
+            <span style="font-size:14px;">|</span>
+        </div>
+        <div class="contact-item">
+            <img src="cid:email_icon" alt="Email" class="contact-icon">
+            <span class="contact-text">info@homesmartify.lu</span>
+            <span style="font-size:14px;">|</span>
+        </div>
+        <div class="contact-item">
+            <img src="cid:web_icon" alt="Website" class="contact-icon">
+            <span class="contact-text">https://www.homesmartify.lu</span>
+        </div>
+        </div>
+        
+                            
+        <div class="subscribe-container">
+        Update your email preferences or unsubscribe
+        <a href="https://newsletter.homesmartify.lu/?email={EMAIL}" target="_blank" rel="noopener nofollow">here</a>.
+        </div>
+        
+                            
+        <div class="footer-container">
+        &copy; 2025 HomeSmartify.lu<br>
+        Transforming Technology: Where Smart Technology Meets Caring Comfort.<br>
+        Luxembourg City, Luxembourg 1329
+        </div>
+        
+                        </td>
+                        </tr>
+                    </table>
+
+                    </td>
+                </tr>
+                </table>
+
+            </td>
+            </tr>
+        </table>
+
+        </body>
+        </html>
+        

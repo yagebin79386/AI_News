@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Subscribe Management</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Favicon Link -->
+  <link rel="icon" type="image/x-icon" href="/static/blockchain.ico">
+  <!-- Include Google Fonts similar to your newsletter design -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Poppins:wght@400;700&family=Nunito:wght@300;400;700&family=Roboto+Condensed:wght@400;700&family=Titan+One&display=swap">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #add8e6, #ffffe0);
+    }
+    #container {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 0 40px;
+      display: flex;
+    }
+    /* Left navigation bar */
+    #sidebar {
+      width: 200px;
+      background: rgba(0, 87, 231, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+      margin-right: 20px;
+    }
+    #sidebar h3 {
+      font-family: 'Roboto Condensed', sans-serif;
+      font-size: 28px;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+      color: #0057e7;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      max-width: 100%;
+    }
+    #sidebar a {
+      display: block;
+      margin: 15px 0;
+      font-family: 'Roboto Condensed', sans-serif;
+      font-size: 16px;
+      text-decoration: none;
+      color: #666666;
+      cursor: pointer;
+    }
+    #sidebar a:hover {
+      color: #0057e7;
+    }
+    /* Right content area */
+    #content {
+      flex: 1;
+    }
+    .content-box {
+      background: rgba(0, 87, 231, 0.1);
+      border-radius: 12px;
+      margin-bottom: 30px;
+      padding: 40px;
+    }
+    .content-box h2 {
+      font-family: 'Poppins', sans-serif;
+      color: #0057e7;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    label {
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      color: #666666;
+    }
+    input[type="email"], input[type="text"] {
+      width: 250px;
+      padding: 8px;
+      margin: 10px 0 20px 0;
+      border-radius: 4px;
+      border: 0px solid #333333;
+      font-family: 'Nunito', sans-serif;
+    }
+    /* Light gray text for the verified email input */
+    input.verified-email {
+      color: #888; /* or #999, pick a comfortable light gray */
+    }
+    select {
+      width: 100%;
+      padding: 8px;
+      margin: 10px 0 20px 0;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-family: 'Nunito', sans-serif;
+    }
+    button {
+      padding: 10px 20px;
+      background: #0057e7;
+      color: #ffffff;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+    }
+    button.preference-btn {
+      margin: 5px;
+      padding: 6px 12px;
+      font-size: 12px;
+      background: rgba(230, 239, 255, 0.3);
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      color: #333;
+      transition: background 0.2s;
+    }
+    button.preference-btn.selected {
+      background: #0057e7;
+      color: #fff;
+    }
+    button:hover {
+      background-color: #3385ff; /* slightly darker orange on hover */
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .status-message {
+      margin-top: 10px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      color: #28a745;
+      opacity: 1;
+      transition: opacity 0.5s ease-out;
+    }
+    /* MEDIA QUERY for Mobile Responsiveness */
+    @media only screen and (max-width: 600px) {
+      #container {
+        flex-direction: column;
+        padding: 0 10px;
+      }
+      #sidebar {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 20px;
+      }
+      #sidebar h3 {
+        font-size: 24px;
+      }
+      #sidebar a {
+        font-size: 14px;
+        margin: 10px 0;
+      }
+      #content {
+        width: 100%;
+      }
+      .content-box {
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+      .content-box h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+      }
+      label {
+        font-size: 13px;
+      }
+      input[type="email"], input[type="text"] {
+        width: 100%;
+        font-size: 14px;
+      }
+      select {
+        font-size: 14px;
+      }
+      button {
+        font-size: 12px;
+      }
+      .status-message {
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <!-- Left Navigation Bar -->
+    <div id="sidebar">
+      {% if subscriber_info %}
+      <h3>Hi {{ subscriber_info.email.split('@')[0] }}!</h3>
+      {% else %}
+        <h3>Navigation</h3>
+      {% endif %}
+      <a href="#subscription">Subscription Management</a>
+      <a href="#preferences">Preferences</a>
+      <a href="#general">General Information</a>
+    </div>
+
+    <!-- Right Content Area -->
+    <div id="content">
+      <!-- Main Newsletter Title -->
+
+      <!-- Subscription Management Section -->
+      <div id="subscription" class="content-box">
+        <h1 class="newsletter-title" style="font-size: 36px; font-weight: bold; color: #007AFF; margin-bottom: 20px; text-align: center;">DeepTech Digest</h1>
+        <h2>Subscription Management</h2>
+        {% if subscriber_info %}
+          <!-- Verified view: only an Unsubscribe option -->
+          <form method="post" id="subMgmtForm">
+            <!-- Keep a hidden field if your server code needs the old email for unsubscribing -->
+            <input type="hidden" name="form_type" value="unsubscribe">
+            <label for="email">Email Address:</label>
+            <!-- Visible input for reference (read-only or user can see the address) -->
+            <input type="email" id="email" name="email" class="verified-email"
+                   value="{{ subscriber_info.email }}" readonly>
+            <br>
+
+            <!-- Only an Unsubscribe button -->
+            <button type="submit">Unsubscribe</button>
+          </form>
+
+          <p style="font-family: 'Nunito', sans-serif; font-size: 14px; color: #333; margin-top: 20px;">
+            Subscribed since {{ subscriber_info.creation_time }} | Last updated {{ subscriber_info.update_time }}
+          </p>
+          {% if email_status %}
+            <div class="status-message">{{ email_status }}</div>
+          {% endif %}
+        {% else %}
+          <!-- Unverified view: Show subscribe form -->
+          <form method="post" id="emailForm">
+            <input type="hidden" name="form_type" value="email_form">
+            <label for="email">Email Address:</label>
+            <input type="email" id="email" name="email" placeholder="Enter your email" value="{{ email }}">
+            <br>
+            <button type="submit">Subscribe !</button>
+          </form>
+          {% if email_status %}
+            <div class="status-message">{{ email_status }}</div>
+          {% else %}
+            <div class="status-message"></div>
+          {% endif %}
+        {% endif %}
+      </div>
+
+
+      <!-- JavaScript for handling forms via AJAX -->
+      <script>
+        // Called when user clicks a category button (for Preferences)
+        function togglePreference(btn) {
+          btn.classList.toggle("selected");
+        }
+
+        // Called before submitting the prefForm to populate hidden input
+        function updatePreferencesField() {
+          let selected = [];
+          document.querySelectorAll('.preference-btn.selected').forEach(function(btn) {
+            selected.push(btn.getAttribute("data-value"));
+          });
+          document.getElementById("selectedPreferences").value = selected.join(",");
+        }
+
+        // Attach an AJAX handler to a form by ID
+        function attachAjaxForm(formId, statusFieldName) {
+          var form = document.getElementById(formId);
+          if (!form) return;
+
+          form.addEventListener("submit", function(e) {
+            e.preventDefault();
+            var formData = new FormData(form);
+
+            // Optional debug
+            console.log("[DEBUG]", formId, "submitting with:", [...formData.entries()]);
+
+            fetch("/", {
+              method: "POST",
+              headers: { "X-Requested-With": "XMLHttpRequest" },
+              body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+              console.log("[DEBUG] response for", formId, ":", data);
+              var statusMsg = data[statusFieldName] || data.email_status || "";
+              var statusElem = form.nextElementSibling;
+              if (!statusElem || !statusElem.classList.contains("status-message")) {
+                statusElem = document.createElement("div");
+                statusElem.className = "status-message";
+                form.parentNode.insertBefore(statusElem, form.nextSibling);
+              }
+              statusElem.textContent = statusMsg;
+              statusElem.style.opacity = 1;
+              setTimeout(function(){
+                statusElem.style.opacity = 0;
+              }, 6000);
+            })
+            .catch(error => {
+              console.error("Error:", error);
+            });
+          });
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+          // For the unverified subscribe form
+          if (document.getElementById("emailForm")) {
+            attachAjaxForm("emailForm", "email_status");
+          }
+          // For the verified subscription management form (Unsubscribe only)
+          if (document.getElementById("subMgmtForm")) {
+            attachAjaxForm("subMgmtForm", "email_status");
+          }
+          // Preferences form
+          if (document.getElementById("prefForm")) {
+            // If needed, call updatePreferencesField() on submit
+            document.getElementById("prefForm").addEventListener("submit", updatePreferencesField);
+            attachAjaxForm("prefForm", "pref_status");
+          }
+          // General info form
+          if (document.getElementById("generalForm")) {
+            attachAjaxForm("generalForm", "general_status");
+          }
+        });
+      </script>
+
+      <!-- Show Preferences & General Info ONLY if verified -->
+      {% if subscriber_info %}
+        <!-- Preferences Section -->
+        <div id="preferences" class="content-box">
+          <h2>Preferences</h2>
+          <form method="post" id="prefForm">
+            <input type="hidden" name="form_type" value="pref_form">
+            <!-- Include subscriber email -->
+            <input type="hidden" name="email" value="{{ subscriber_info.email }}">
+            <div>
+              {% for option in preference_options %}
+                <button
+                  type="button"
+                  class="preference-btn {% if subscriber_info.preferences and option in subscriber_info.preferences %}selected{% endif %}"
+                  onclick="togglePreference(this)"
+                  data-value="{{ option }}"
+                >
+                  {{ option }}
+                </button>
+              {% endfor %}
+            </div>
+            <!-- Hidden input to hold selected preferences -->
+            <input type="hidden" name="preferences" id="selectedPreferences" value="">
+            <br>
+            <button type="submit">Update Preferences</button>
+          </form>
+          {% if pref_status %}
+            <div class="status-message">{{ pref_status }}</div>
+          {% endif %}
+        </div>
+
+        <!-- General Information Section -->
+        <div id="general" class="content-box">
+          <h2>General Information</h2>
+          <form method="post" id="generalForm">
+            <input type="hidden" name="form_type" value="general_form">
+            <!-- Include subscriber email -->
+            <input type="hidden" name="email" value="{{ subscriber_info.email }}">
+
+            <!-- 1. Which age range do you fall into? -->
+            <div class="form-group">
+              <label><strong>Which age range do you fall into?</strong></label><br>
+              <select name="age_range">
+                <option value="Under 18" 
+                  {% if subscriber_info.age_range == "Under 18" %}selected{% endif %}>Under 18</option>
+                <option value="18–24" 
+                  {% if subscriber_info.age_range == "18–24" %}selected{% endif %}>18–24</option>
+                <option value="25–45" 
+                  {% if subscriber_info.age_range == "25–45" %}selected{% endif %}>25–45</option>
+                <option value="46–64" 
+                  {% if subscriber_info.age_range == "46–64" %}selected{% endif %}>46–64</option>
+                <option value="65 or older" 
+                  {% if subscriber_info.age_range == "65 or older" %}selected{% endif %}>65 or older</option>
+              </select>
+            </div>
+
+            <!-- 2. How do you identify your gender? -->
+            <div class="form-group">
+              <label><strong>How do you identify your gender?</strong></label><br>
+              <select name="gender">
+                <option value="Male" 
+                  {% if subscriber_info.gender == "Male" %}selected{% endif %}>Male</option>
+                <option value="Female" 
+                  {% if subscriber_info.gender == "Female" %}selected{% endif %}>Female</option>
+                <option value="Non-binary/Third gender" 
+                  {% if subscriber_info.gender == "Non-binary/Third gender" %}selected{% endif %}>Non-binary/Third gender</option>
+                <option value="Prefer not to say" 
+                  {% if subscriber_info.gender == "Prefer not to say" %}selected{% endif %}>Prefer not to say</option>
+              </select>
+            </div>
+
+            <!-- 3. In which country or region do you currently reside? -->
+            <div class="form-group">
+              <label><strong>In which country or region do you currently reside?</strong></label><br>
+              <select name="residence_country">
+                <option value="">-- Select Country/Region --</option>
+                {% for country in all_countries %}
+                  <option value="{{ country }}" 
+                    {% if subscriber_info.residence_country == country %}selected{% endif %}>
+                    {{ country }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <!-- 4. How experienced are you with Artificial Intelligence? -->
+            <div class="form-group">
+              <label><strong>How experienced are you with Artificial Intelligence?</strong></label><br>
+              <select name="ai_involement">
+                <option value="Beginner (just exploring)" 
+                  {% if subscriber_info.ai_involement == "Beginner (just exploring)" %}selected{% endif %}>Beginner (just exploring)</option>
+                <option value="Intermediate (familiar, occasionally use or study)" 
+                  {% if subscriber_info.ai_involement == "Intermediate (familiar, occasionally use or study)" %}selected{% endif %}>Intermediate (familiar, occasionally use or study)</option>
+                <option value="Advanced (regularly work/study in AI fields)" 
+                  {% if subscriber_info.ai_involement == "Advanced (regularly work/study in AI fields)" %}selected{% endif %}>Advanced (regularly work/study in AI fields)</option>
+                <option value="Expert (actively involved in research or industry projects)" 
+                  {% if subscriber_info.ai_involement == "Expert (actively involved in research or industry projects)" %}selected{% endif %}>Expert (actively involved in research or industry projects)</option>
+              </select>
+            </div>
+
+            <!-- 5. What's your main purpose for subscribing to this newsletter? -->
+            <div class="form-group">
+              <label><strong>What's your main purpose for subscribing to this newsletter?</strong></label><br>
+              <select name="reason_for_subscribing">
+                <option value="Staying informed about industry developments" 
+                  {% if subscriber_info.reason_for_subscribing == "Staying informed about industry developments" %}selected{% endif %}>Staying informed about industry developments</option>
+                <option value="Academic research and knowledge enhancement" 
+                  {% if subscriber_info.reason_for_subscribing == "Academic research and knowledge enhancement" %}selected{% endif %}>Academic research and knowledge enhancement</option>
+                <option value="Professional growth and career opportunities" 
+                  {% if subscriber_info.reason_for_subscribing == "Professional growth and career opportunities" %}selected{% endif %}>Professional growth and career opportunities</option>
+                <option value="Investment or entrepreneurial opportunities" 
+                  {% if subscriber_info.reason_for_subscribing == "Investment or entrepreneurial opportunities" %}selected{% endif %}>Investment or entrepreneurial opportunities</option>
+                <option value="General personal interest" 
+                  {% if subscriber_info.reason_for_subscribing == "General personal interest" %}selected{% endif %}>General personal interest</option>
+              </select>
+            </div>
+
+            <input type="hidden" name="redirect_anchor" value="general">
+            <button type="submit">Update General Information</button>
+          </form>
+          {% if general_status %}
+            <div class="status-message">{{ general_status }}</div>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>
