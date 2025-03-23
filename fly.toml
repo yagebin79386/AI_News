@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for news-ai-old-smoke-3779 on 2025-03-23T12:55:54+01:00
+# fly.toml app configuration file generated for news-ai-yagebin on 2025-03-23T13:40:13+01:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'news-ai-old-smoke-3779'
+app = 'news-ai-yagebin'
 primary_region = 'fra'
 
 [build]
@@ -11,9 +11,9 @@ primary_region = 'fra'
 [http_service]
   internal_port = 8080
   force_https = true
-  auto_stop_machines = 'stop'
+  auto_stop_machines = false
   auto_start_machines = true
-  min_machines_running = 0
+  min_machines_running = 1
   processes = ['app']
 
 [[vm]]

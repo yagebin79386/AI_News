@@ -43,7 +43,7 @@ RUN touch /var/log/news_AI_scrape_app.log && chmod 644 /var/log/news_AI_scrape_a
 RUN touch /var/log/news_AI_categorization_app.log && chmod 644 /var/log/news_AI_categorization_app.log
 RUN touch /var/log/news_AI_evaluation_app.log && chmod 644 /var/log/news_AI_evaluation_app.log
 RUN touch /var/log/news_AI_generate_app.log && chmod 644 /var/log/news_AI_generate_app.log
-RUN touch /var/log/ews_AI_send_app.log && chmod 644 /var/log/news_AI_send_app.log
+RUN touch /var/log/news_AI_send_app.log && chmod 644 /var/log/news_AI_send_app.log
 
 # Copy all project files into the container
 COPY . .
