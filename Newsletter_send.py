@@ -36,7 +36,7 @@ class SendNewsletter:
         replaced_html = html_content.replace("{EMAIL}", quote(recipient))
 
         sender = 'newsletter@homesmartify.lu'
-        password = 'jngo-aajx-zohu-zmxe'
+        password = os.environ.get("EMAIL_PASSWORD")
 
         # Outer container: 'related' type to support inline images.
         msg_root = MIMEMultipart('related')

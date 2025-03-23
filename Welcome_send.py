@@ -5,6 +5,8 @@ from email.mime.image import MIMEImage
 import psycopg2
 import psycopg2.extras
 from urllib.parse import quote
+import os
+from dotenv import load_dotenv
 
 def send_welcome_email_to_user(recipient_email):
     """
@@ -12,7 +14,7 @@ def send_welcome_email_to_user(recipient_email):
     """
     # Email configuration
     sender = "newsletter@homesmartify.lu"
-    sender_password = "jngo-aajx-zohu-zmxe"  # or app-specific password
+    sender_password = os.environ.get("EMAIL_PASSWORD")  # or app-specific password
     subject = "Welcome to DeepTech Digest!"
 
     # Contact information
@@ -200,5 +202,6 @@ def send_welcome_email_to_user(recipient_email):
 
 
 if __name__ == "__main__":
+    load_dotenv()
     test_email = "yagebin79386@gmail.com"
     send_welcome_email_to_user(test_email)

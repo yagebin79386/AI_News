@@ -7,6 +7,9 @@ import psycopg2.extras
 from urllib.parse import quote
 from urllib.parse import urlparse
 import os
+from dotenv import load_dotenv
+
+
 
 def send_subs_management_email_to_user(recipient_email):
     """
@@ -14,7 +17,7 @@ def send_subs_management_email_to_user(recipient_email):
     """
     # Email configuration
     sender = "newsletter@homesmartify.lu"
-    sender_password = "jngo-aajx-zohu-zmxe"  # or app-specific password
+    sender_password = os.environ.get("EMAIL_PASSWORD")  # or app-specific password
     subject = "Manage Your AI Newsletter!"
 
     # Contact information
@@ -199,5 +202,6 @@ def send_subs_management_email_to_user(recipient_email):
 
 
 if __name__ == "__main__":
+    load_dotenv()
     test_email = "yagebin79386@gmail.com"
     send_subs_management_email_to_user(test_email)
