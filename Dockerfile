@@ -39,11 +39,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN ln -sf /usr/local/bin/python3 /usr/local/bin/python
 
 # Create log file
-RUN touch /var/log/news_AI_app.log && chmod 644 /var/log/news_AI_scrape_app.log
-RUN touch /var/log/news_AI_app.log && chmod 644 /var/log/news_AI_categorization_app.log
-RUN touch /var/log/news_AI_app.log && chmod 644 /var/log/news_AI_evaluation_app.log
-RUN touch /var/log/news_AI_app.log && chmod 644 /var/log/news_AI_generate_app.log
-RUN touch /var/log/news_AI_app.log && chmod 644 /var/log/news_AI_send_app.log
+RUN touch /var/log/news_AI_scrape_app.log && chmod 644 /var/log/news_AI_scrape_app.log
+RUN touch /var/log/news_AI_categorization_app.log && chmod 644 /var/log/news_AI_categorization_app.log
+RUN touch /var/log/news_AI_evaluation_app.log && chmod 644 /var/log/news_AI_evaluation_app.log
+RUN touch /var/log/news_AI_generate_app.log && chmod 644 /var/log/news_AI_generate_app.log
+RUN touch /var/log/ews_AI_send_app.log && chmod 644 /var/log/news_AI_send_app.log
 
 # Copy all project files into the container
 COPY . .
