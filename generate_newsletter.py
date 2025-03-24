@@ -113,7 +113,7 @@ class NewsletterGenerator:
                     "Please provide your response in JSON format with the keys \"introduction\" and \"newsletter_title\"."
                 )
             }],
-            max_tokens=1000
+            max_tokens=750
         )
 
 
@@ -282,10 +282,10 @@ class NewsletterGenerator:
         head_area_html = f"""
         <!-- HEAD Area Table -->
         <table width="100%" border="0" cellspacing="0" cellpadding="0" 
-            style="background: rgba(255,255,255,0.0); border-radius:12px;">
+            style="background: rgba(0, 87, 231, 0); border-radius:12px;">
         <!-- Top row: Issue info (left) and share buttons (right) -->
         <tr class="issue-info-block">
-            <td align="left" style="font-family: 'Roboto Condensed', sans-serif; font-size: 13px; color: #555; padding:0 0 20px 0;">
+            <td align="left" style="font-family: 'Roboto Condensed', sans-serif; font-size: 13px; color: #666666; padding:0 0 20px 0;">
             Issue No.{newsletter_id} Edition {edition_number}<br>
             Current Date: {date_only_str}
             </td>
@@ -295,23 +295,23 @@ class NewsletterGenerator:
                 <!-- Twitter Share Button -->
                 <td align="center" style="padding:5px;">
                     <a href="https://twitter.com/intent/tweet?url=YOUR_URL&text=Check%20this%20out!" 
-                    target="_blank" style="text-decoration:none; color:#333;">
+                    target="_blank" style="text-decoration:none; color:#666666;">
                     <img src="cid:twitter_icon" alt="Twitter" style="width:20px; height:20px;">
-                    <span style="font-family:Arial, sans-serif; font-size:12px;">Twitter</span>
+                    <span style="font-family:'Nunito', sans-serif; font-size:12px;">Twitter</span>
                     </a>
                 </td>
                 <!-- Copy Link Button -->
                 <td align="center" style="padding:5px;">
-                    <a href="YOUR_URL" target="_blank" style="text-decoration:none; color:#333;">
+                    <a href="YOUR_URL" target="_blank" style="text-decoration:none; color:#666666;">
                     <img src="cid:copylink_icon" alt="Copy Link" style="width:23px; height:23px;">
-                    <span style="font-family:Arial, sans-serif; font-size:12px;">Copy Link</span>
+                    <span style="font-family:'Nunito', sans-serif; font-size:12px;">Copy Link</span>
                     </a>
                 </td>
                 <!-- WhatsApp Share Button -->
                 <td align="center" style="padding:5px;">
-                    <a href="https://api.whatsapp.com/send?text=YOUR_URL" target="_blank" style="text-decoration:none; color:#333;">
+                    <a href="https://api.whatsapp.com/send?text=YOUR_URL" target="_blank" style="text-decoration:none; color:#666666;">
                     <img src="cid:whatsapp_icon" alt="WhatsApp" style="width:20px; height:20px;">
-                    <span style="font-family:Arial, sans-serif; font-size:12px;">WhatsApp</span>
+                    <span style="font-family:'Nunito', sans-serif; font-size:12px;">WhatsApp</span>
                     </a>
                 </td>
                 </tr>
@@ -321,7 +321,7 @@ class NewsletterGenerator:
         <!-- Second row: Newsletter title -->
         <tr>
             <td class="newsletter" colspan="2" align="center" 
-                style="font-family: 'Titan+One', sans-serif; letter-spacing: 2px; font-size:38px; color:#007AFF; text-transform:uppercase; padding:20px 0;">
+                style="font-family: 'Poppins', sans-serif; letter-spacing: 2px; font-size:38px; color:#0057e7; text-transform:uppercase; padding:20px 0;">
             DEEPTECH DIGEST
             </td>
         </tr>
@@ -335,7 +335,7 @@ class NewsletterGenerator:
             display:block;
             font-family:'Poppins', sans-serif;
             font-size:22px; 
-            color:#007AFF; 
+            color:#0057e7; 
             margin:0 auto 20px auto; 
             text-align:center; 
             max-width:600px;
@@ -345,7 +345,7 @@ class NewsletterGenerator:
         <p class="newsletter_intro" style="
             font-size:16px;
             font-family:'Nunito', sans-serif;
-            color:#333; 
+            color:#333333; 
             margin:0 30px 40px 30px; 
             max-width:700px; 
             text-align:left;
@@ -361,7 +361,7 @@ class NewsletterGenerator:
         <h3 class="article-title" style="
             font-size:20px;
             font-family:'Poppins', sans-serif;
-            color:#34AADC; 
+            color:#0057e7; 
             margin:10px 35px 10px 35px; 
             text-align:center;
         ">
@@ -370,7 +370,7 @@ class NewsletterGenerator:
         <p class="publication-date" style="
             font-size:14px;
             font-family:'Nunito', sans-serif;
-            color:#999;
+            color:#666666;
             text-align:center;
             margin-bottom:10px;
         ">
@@ -389,12 +389,14 @@ class NewsletterGenerator:
             <a href="{link}" target="_blank" style="text-decoration:none;">
             <button style="
                 padding:6px 12px; 
-                background:#007AFF; 
+                background:#0057e7; 
                 color:#ffffff; 
                 border:none; 
                 border-radius:20px; 
                 cursor:pointer;
                 font-size:12px;
+                font-family:'Poppins', sans-serif;
+                transition: background-color 0.2s;
             ">
                 READ MORE ({read_time} mins)
             </button>
@@ -430,7 +432,7 @@ class NewsletterGenerator:
         <h3 class="top-news-title" style="
             font-family:'Poppins', sans-serif;
             font-size:20px; 
-            color:#34AADC; 
+            color:#0057e7; 
             margin:0 35px 12px 35px; 
             text-align:center;
         ">
@@ -439,7 +441,7 @@ class NewsletterGenerator:
         <p class="publication-date" style="
             font-size:14px;
             font-family:'Nunito', sans-serif;
-            color:#999;
+            color:#666666;
             text-align:center;
             margin-bottom:10px;
         ">
@@ -458,12 +460,14 @@ class NewsletterGenerator:
             <a href="{top_link}" target="_blank" style="text-decoration:none;">
             <button style="
                 padding:6px 12px; 
-                background:#007AFF; 
-                color:#fff; 
+                background:#0057e7; 
+                color:#ffffff; 
                 border:none; 
                 border-radius:20px; 
                 cursor:pointer;
                 font-size:12px;
+                font-family:'Poppins', sans-serif;
+                transition: background-color 0.2s;
             ">
                 READ MORE ({top_read_time} mins)
             </button>
@@ -475,20 +479,21 @@ class NewsletterGenerator:
         # Redirect block
         redirect_html = f"""
         <div style="text-align:center; margin-top:20px;">
-        <p style="font-size:14px; font-family:'Poppins', sans-serif; color:#333; margin-bottom:10px;">
+        <p style="font-size:14px; font-family:'Poppins', sans-serif; color:#333333; margin-bottom:10px;">
             Feel free to visit our website for more news and smart technologies possibilities!
         </p>
         <a href="{self.redirect_link}" target="_blank" style="text-decoration:none;">
             <button style="
                 padding:8px 16px; 
-                background:#007AFF; 
-                color:#fff; 
+                background:#0057e7; 
+                color:#ffffff; 
                 border:none; 
                 border-radius:20px; 
                 cursor:pointer; 
-                font-family:'Titan One', monospace; 
+                font-family:'Poppins', sans-serif; 
                 text-transform:uppercase; 
                 font-size:14px;
+                transition: background-color 0.2s;
             ">
                 Explore More
             </button>
@@ -549,7 +554,7 @@ class NewsletterGenerator:
             /* Default Style */
             .top-news-header {{
                 text-align: center;
-                color: #34C759;
+                color: #0057e7;
                 font-family: 'Titan One', sans-serif;
                 font-size: 28px;
                 letter-spacing: 2px;
@@ -584,91 +589,88 @@ class NewsletterGenerator:
             }}
             .contact-text {{
                 font-size: 14px;
+                color: #666666;
             }}
             .subscribe-container {{
                 text-align: center;
                 font-size: 14px;
                 font-style: italic;
-                color: #666;
+                color: #666666;
                 margin: 25px 0;
             }}
             .footer-container {{
                 text-align: center;
                 font-size: 12px;
-                color: #666;
+                color: #666666;
                 margin-top: 20px;
                 line-height: 1.4;
             }}
 
             /* Mobile Styles */
             @media only screen and (max-width: 600px) {{
-            /* Keep your layout the same; do NOT force the main table to width:100% */
-            /* Only override fonts for head-container and main-container */
-            .top-news-header {{
-                font-size: 36px !important;  
+                .top-news-header {{
+                    font-size: 36px !important;  
+                }}
+                .company-logo-img {{
+                    width: 150px !important;
+                    max-width: 150px !important;
+                }}
+                .contact-container {{
+                    flex-direction: column;
+                    gap: 10px;
+                }}
+                .contact-text {{
+                    font-size: 20px !important;
+                }}
+                .contact-icon {{
+                    width: 30px;
+                    height: 30px;
+                }}
+                .subscribe-container {{
+                    font-size: 20px !important;
+                }}
+                .footer-container {{
+                    font-size: 18px !important;
+                }}
+                .head-container * {{
+                    font-size: 26px;
+                }}
+                .main-container * {{    
+                    font-size: 26px !important;
+                }}
+                .newsletter_title {{
+                    font-size: 36px !important;
+                    margin:0 30px 20px 30px !important;
+                }}
+                .newsletter_intro {{
+                    font-size: 28px !important;
+                }}
+                .article-title {{
+                    font-size: 32px !important;
+                }}
+                .article-summary {{ 
+                    font-size: 26px !important;
+                }}
+                .top-news-title {{ 
+                    font-size: 32px !important;
+                }}
+                .top-news-text {{
+                    font-size: 26px !important;
+                }}
+                .newsletter {{ 
+                    font-size: 45px !important;
+                }}
+                .issue-info-block * {{
+                    font-size: 26px !important; 
+                }}
+                .issue-info-block img {{
+                    width: 40px !important; 
+                    height: auto !important;
+                }}
             }}
-            .company-logo-img {{
-                width: 150px !important;
-                max-width: 150px !important;
-            }}
-            .contact-container {{
-                flex-direction: column;
-                gap: 10px;
-            }}
-            .contact-text {{
-                font-size: 20px !important;
-            }}
-            .contact-icon {{
-                width: 30px;
-                height: 30px;
-            }}
-            .subscribe-container {{
-                font-size: 20px !important;
-            }}
-            .footer-container {{
-                font-size: 18px !important;
-            }}
-            .head-container * {{
-                /* +4px from your original, adjust as needed */
-                font-size: 26px;
-            }}
-            .main-container * {{    
-                font-size: 26px !important; /* Consistent font size for main container */
-            }}
-            .newsletter_title {{
-                font-size: 36px !important;
-                margin:0 30px 20px 30px !important;
-            }}
-            .newsletter_intro {{
-                font-size: 28px !important;
-            }}
-            .article-title {{
-                font-size: 32px !important;
-            }}
-            .article-summary {{ 
-                font-size: 26px !important; /* Example addition for article summary styling */
-            }}
-            .top-news-title {{ 
-                font-size: 32px !important; /* Example addition for top news title styling */
-            }}
-            .top-news-text {{
-                font-size: 26px !important; /* Example addition for top news text styling */
-            }}
-            .newsletter {{ 
-                font-size: 45px !important; /* Example addition for newsletter styling */
-            }}
-            .issue-info-block * {{
-                font-size: 26px !important; 
-            }}
-            /* Enlarge images by 50% (width) within .issue-info-block */
-            .issue-info-block img {{
-                width: 40px !important; 
-                height: auto !important; /* maintain aspect ratio */
-            }}
-        }}
         </style>
         </head>
-        <body style="margin:0; padding:0; background:linear-gradient(135deg, #add8e6, #ffffe0); font-family:Arial, sans-serif;">
+        <body style="margin:0; padding:0; background:linear-gradient(135deg, #add8e6, #ffffe0); font-family:'Nunito', sans-serif;">
 
         <!-- Outer table for full width background -->
         <table width="100%" border="0" cellspacing="0" cellpadding="0" align="center" style="background: linear-gradient(135deg, #add8e6, #ffffe0);">
@@ -682,7 +684,7 @@ class NewsletterGenerator:
 
                     <!-- HEAD Container -->
                     <table class="head-container" width="100%" border="0" cellspacing="0" cellpadding="0" align="center"
-                            style="background: rgba(255,255,255,0.3); border-radius:12px; margin-bottom:20px;">
+                            style="background: rgba(0, 87, 231, 0.1); border-radius:12px; margin-bottom:20px;">
                         <tr>
                         <td style="padding:20px;">
                             {head_area_html}
@@ -692,13 +694,13 @@ class NewsletterGenerator:
 
                     <!-- MAIN Container -->
                     <table class="main-container" width="100%" border="0" cellspacing="0" cellpadding="0" align="center"
-                            style="background: rgba(255,255,255,0.3); border-radius:12px; margin-bottom:20px;">
+                            style="background: rgba(0, 87, 231, 0.1); border-radius:12px; margin-bottom:20px;">
                         <tr>
                         <td style="padding:20px;">
                             {intro_html}
-                            <hr style="border:none; border-top:2px solid #5AC8FA; margin:20px 0;">
+                            <hr style="border:none; border-top:2px solid #0057e7; margin:20px 0;">
                             {article_blocks}
-                            <hr style="border:none; border-top:2px solid #5AC8FA; margin:40px 0;">
+                            <hr style="border:none; border-top:2px solid #0057e7; margin:40px 0;">
                             {top_news_header_html}
                             {top_news_html}
                             {redirect_html}
@@ -708,7 +710,7 @@ class NewsletterGenerator:
 
                     <!-- TAIL Container -->
                     <table class="tail-container" width="100%" border="0" cellspacing="0" cellpadding="0" align="center"
-                            style="background: rgba(255,255,255,0.3); border-radius:12px;">
+                            style="background: rgba(0, 87, 231, 0.1); border-radius:12px;">
                         <tr>
                         <td style="padding:20px;">
                             {company_logo_html}
