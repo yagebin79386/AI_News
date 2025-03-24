@@ -25,7 +25,7 @@ def send_welcome_email_to_user(recipient_email):
     }
 
     # Build subscription management link
-    manage_link = f"https://newsletter.homesmartify.lu/?email={recipient_email}"
+    manage_link = f"https://ainewsletter.homesmartify.lu/?email={recipient_email}"
 
 
     msg_root = MIMEMultipart('related')
