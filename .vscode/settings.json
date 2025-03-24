@@ -19,6 +19,13 @@
             "database": "ai_news",
             "username": "rickytan",
             "password": "Lemont7!"
+        },
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "driver": "PostgreSQL",
+            "name": "fly_ai_news_db",
+            "connectString": "postgres://postgres:NUizJbF1I6OhHDs@newsai-db.flycast:5432"
         }
     ]
 }
