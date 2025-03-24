@@ -17,6 +17,7 @@ RUN apt-get update && apt-get install -y \
     fonts-liberation \
     libasound2 \
     vim \
+    postgresql-client \
     --no-install-recommends \
  && rm -rf /var/lib/apt/lists/*
 
@@ -66,7 +67,7 @@ RUN crontab /etc/cron.d/mycron
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Expose the port your Flask app will run on (Fly.io expects 8080 by default)
-EXPOSE 8080
+EXPOSE 8083
 
 # The main process: run Supervisor in the foreground
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

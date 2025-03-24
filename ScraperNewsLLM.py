@@ -53,16 +53,21 @@ class NewsScrapperGeneral:
         Stops after finding 10 additional pages per base URL (total 11 pages).
         """
         options = uc.ChromeOptions()
-        options.headless = True  # Change to True for silent mode
+        options.headless = True
         options.add_argument("--headless=new")
         options.add_argument("--disable-blink-features=AutomationControlled")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--disable-gpu")
         options.add_argument("--window-size=1920,1080")
-        options.add_argument("--log-level=3")
+        options.add_argument("--remote-debugging-port=9222")
+        options.add_argument("--disable-setuid-sandbox")
         options.add_argument("--disable-extensions")
         options.add_argument("--disable-infobars")
+        options.add_argument("--single-process")
+        options.add_argument("--disable-dev-tools")
+        options.add_argument("--ignore-certificate-errors")
+        options.add_argument("--homedir=/tmp")
 
         driver = uc.Chrome(options=options)
         max_pages = 5  # base URL + 10 additional pages
@@ -106,48 +111,84 @@ class NewsScrapperGeneral:
 
     def get_and_clean_html(self):
         """
-        Fetches raw HTML from each paginated URL using undetected_chromedriver,
+        Fetches raw HTML from each paginated URL using requests first,
+        falls back to undetected_chromedriver if needed,
         cleans it, and stores the cleaned HTML in the 'html' dict keyed by the paginated URL.
         """
-        options = uc.ChromeOptions()
-        options.headless = True  
-        options.add_argument("--disable-blink-features=AutomationControlled")
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
-        driver = uc.Chrome(options=options)
-        try:
-            for page in self.webpages:
-                if page['base_url'] not in page["paginated_url"]:
-                    page["paginated_url"].append(page["base_url"])
-                for single_url in page["paginated_url"]:
+        session = requests.Session()
+        session.headers.update({
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        })
+
+        def clean_html(raw_html):
+            soup = BeautifulSoup(raw_html, "html.parser")
+            for tag in soup(["script", "style", "noscript", "iframe", "svg", "path", "object",
+                           "embed", "picture", "video", "audio", "source", "input",
+                           "ins", "del", "form", "button"]):
+                tag.decompose()
+            for tag in soup.find_all():
+                if not tag.get_text(strip=True):
+                    tag.decompose()
+            for tag in soup.find_all(True):
+                attrs_to_remove = ["class", "id", "role", "data-*", "aria-*", "onclick", "onload", "style"]
+                for attr in list(tag.attrs):
+                    if tag.name == "a" and attr == "href":
+                        continue
+                    if any(re.match(pattern.replace("*", ".*"), attr) for pattern in attrs_to_remove):
+                        del tag[attr]
+            cleaned_html = str(soup)
+            cleaned_html = re.sub(r">\s+<", "><", cleaned_html)
+            cleaned_html = re.sub(r"\n+", "", cleaned_html)
+            cleaned_html = re.sub(r"\s{2,}", " ", cleaned_html)
+            return cleaned_html
+
+        for page in self.webpages:
+            if page['base_url'] not in page["paginated_url"]:
+                page["paginated_url"].append(page["base_url"])
+            
+            for single_url in page["paginated_url"]:
+                try:
+                    # First try with requests
+                    response = session.get(single_url, timeout=30)
+                    response.raise_for_status()
+                    raw_html = response.text
+                    page["html"][single_url] = clean_html(raw_html)
+                    print(f"✅ Successfully fetched {single_url} using requests")
+                    continue
+                except Exception as e:
+                    print(f"⚠️ Failed to fetch {single_url} with requests: {e}")
+                    print("Falling back to Selenium...")
+
+                # Fall back to Selenium if requests fails
+                try:
+                    options = uc.ChromeOptions()
+                    options.headless = True
+                    options.add_argument("--headless=new")
+                    options.add_argument("--disable-blink-features=AutomationControlled")
+                    options.add_argument("--no-sandbox")
+                    options.add_argument("--disable-dev-shm-usage")
+                    options.add_argument("--disable-gpu")
+                    options.add_argument("--window-size=1920,1080")
+                    options.add_argument("--remote-debugging-port=9222")
+                    options.add_argument("--disable-setuid-sandbox")
+                    options.add_argument("--disable-extensions")
+                    options.add_argument("--disable-infobars")
+                    options.add_argument("--single-process")
+                    options.add_argument("--disable-dev-tools")
+                    options.add_argument("--ignore-certificate-errors")
+                    options.add_argument("--homedir=/tmp")
+
+                    driver = uc.Chrome(options=options)
                     try:
                         driver.get(single_url)
                         raw_html = driver.page_source
-                    except Exception as e:
-                        print(f"Failed to fetch {single_url}: {e}")
-                        continue
-                    soup = BeautifulSoup(raw_html, "html.parser")
-                    for tag in soup(["script", "style", "noscript", "iframe", "svg", "path", "object",
-                                      "embed", "picture", "video", "audio", "source", "input",
-                                      "ins", "del", "form", "button"]):
-                        tag.decompose()
-                    for tag in soup.find_all():
-                        if not tag.get_text(strip=True):
-                            tag.decompose()
-                    for tag in soup.find_all(True):
-                        attrs_to_remove = ["class", "id", "role", "data-*", "aria-*", "onclick", "onload", "style"]
-                        for attr in list(tag.attrs):
-                            if tag.name == "a" and attr == "href":
-                                continue
-                            if any(re.match(pattern.replace("*", ".*"), attr) for pattern in attrs_to_remove):
-                                del tag[attr]
-                    cleaned_html = str(soup)
-                    cleaned_html = re.sub(r">\s+<", "><", cleaned_html)
-                    cleaned_html = re.sub(r"\n+", "", cleaned_html)
-                    cleaned_html = re.sub(r"\s{2,}", " ", cleaned_html)
-                    page["html"][single_url] = cleaned_html
-        finally:
-            driver.quit()
+                        page["html"][single_url] = clean_html(raw_html)
+                        print(f"✅ Successfully fetched {single_url} using Selenium")
+                    finally:
+                        driver.quit()
+                except Exception as e:
+                    print(f"❌ Failed to fetch {single_url} with both methods: {e}")
+                    continue
 
     def extract_news_articles_with_chatgpt(self):
         """
@@ -168,7 +209,7 @@ class NewsScrapperGeneral:
                 - **Title**: the title of the article.
                 - **Publication Date**: If no date is explicitly given, return null.
                 - **Author**: the name(s) of the author(s).
-                - **Link**: the article’s full hyperlink. If the hyperlink is relative, prepend the base URL (e.g., "https://cointelegraph.com/") so that the result is an absolute URL starting with "http://" or "https://".
+                - **Link**: the article's full hyperlink. If the hyperlink is relative, prepend the base URL (e.g., "https://cointelegraph.com/") so that the result is an absolute URL starting with "http://" or "https://".
                 Extract this from the following HTML:
                 ```html
                 {raw_html}
