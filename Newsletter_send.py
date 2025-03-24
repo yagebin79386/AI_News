@@ -7,6 +7,8 @@ import psycopg2
 import psycopg2.extras
 from urllib.parse import urlparse
 import os
+from dotenv import load_dotenv
+
 
 
 class SendNewsletter:
@@ -94,7 +96,8 @@ class SendNewsletter:
             self.send_email(email, subject)
             print(f"Newsletter to {email} has been sent.")
 
-if __name__ == "__main__":
+if __name__ == "__main__":    
+    load_dotenv()
     db_url = os.environ.get("DATABASE_URL")
     if not db_url:
         raise ValueError("❌ DATABASE_URL environment variable not set.") 
