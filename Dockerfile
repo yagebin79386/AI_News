@@ -1,6 +1,10 @@
 # Use a lightweight Python base image
 FROM python:3.10-slim
 
+# Set timezone
+ENV TZ=Europe/London
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 # Install cron & supervisor so we can run multiple processes
 RUN apt-get update && apt-get install -y \
     gnupg2 \
@@ -18,6 +22,7 @@ RUN apt-get update && apt-get install -y \
     libasound2 \
     vim \
     postgresql-client \
+    tzdata \
     --no-install-recommends \
  && rm -rf /var/lib/apt/lists/*
 
@@ -50,15 +55,14 @@ RUN touch /var/log/news_AI_send_app.log && chmod 644 /var/log/news_AI_send_app.l
 COPY . .
 
 # Create crontab file with proper line endings
-RUN echo "0 17 * * 1,3,5 root /usr/local/bin/python3 /app/ScraperNewsLLM.py >> /var/log/news_AI_scrape_app.log 2>&1" > /etc/cron.d/mycron
-RUN echo "30 18 * * 1,3,5 root /usr/local/bin/python3 /app/categorizationLLM.py >> /var/log/news_AI_categorization_app.log 2>&1" >> /etc/cron.d/mycron
-RUN echo "20 19 * * 1,3,5 root /usr/local/bin/python3 /app/evaluate_articles.py >> /var/log/news_AI_evaluation_app.log 2>&1" >> /etc/cron.d/mycron
-RUN echo "30 19 * * 1,3,5 root /usr/local/bin/python3 /app/generate_newsletter.py >> /var/log/news_AI_generate_app.log 2>&1" >> /etc/cron.d/mycron
-RUN echo "0 20 * * 1,3,5 root  /usr/local/bin/python3 /app/Newsletter_send.py >> /var/log/news_AI_send_app.log 2>&1" >> /etc/cron.d/mycron
+RUN echo "0 17 * * 1,3,5 root /usr/local/bin/python3 /app/ScraperNewsLLM.py >> /var/log/news_AI_scrape_app.log 2>&1" > /etc/cron.d/news_ai_cron
+RUN echo "30 18 * * 1,3,5 root /usr/local/bin/python3 /app/categorizationLLM.py >> /var/log/news_AI_categorization_app.log 2>&1" >> /etc/cron.d/news_ai_cron
+RUN echo "20 19 * * 1,3,5 root /usr/local/bin/python3 /app/evaluate_articles.py >> /var/log/news_AI_evaluation_app.log 2>&1" >> /etc/cron.d/news_ai_cron
+RUN echo "30 19 * * 1,3,5 root /usr/local/bin/python3 /app/generate_newsletter.py >> /var/log/news_AI_generate_app.log 2>&1" >> /etc/cron.d/news_ai_cron
+RUN echo "0 20 * * 1,3,5 root /usr/local/bin/python3 /app/Newsletter_send.py >> /var/log/news_AI_send_app.log 2>&1" >> /etc/cron.d/news_ai_cron
 
-# Make the crontab file readable by cron, then register it
-RUN chmod 0644 /etc/cron.d/mycron
-RUN crontab /etc/cron.d/mycron
+# Set proper permissions for the cron file
+RUN chmod 0644 /etc/cron.d/news_ai_cron
 
 # Create supervisor configuration
 RUN echo '[supervisord]\n\

@@ -9,7 +9,9 @@ from urllib.parse import urlparse
 import os
 from dotenv import load_dotenv
 
-
+# Get the directory where the script is located
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_DIR = os.path.join(SCRIPT_DIR, 'static')
 
 def send_subs_management_email_to_user(recipient_email):
     """
@@ -172,10 +174,10 @@ def send_subs_management_email_to_user(recipient_email):
     # Load icon from the static folder
     # Define the images to attach with their corresponding CIDs.
     images = {
-        'company_logo': 'static/company_logo.png',
-        'phone_icon': 'static/phone.png',
-        'email_icon': 'static/mail.png',
-        'web_icon': 'static/web.png'
+        'company_logo': os.path.join(STATIC_DIR, 'company_logo.png'),
+        'phone_icon': os.path.join(STATIC_DIR, 'phone.png'),
+        'email_icon': os.path.join(STATIC_DIR, 'mail.png'),
+        'web_icon': os.path.join(STATIC_DIR, 'web.png')
     }
 
 

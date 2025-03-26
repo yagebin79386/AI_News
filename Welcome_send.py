@@ -12,6 +12,9 @@ def send_welcome_email_to_user(recipient_email):
     """
     Build a 'Welcome' HTML email and send it to 'recipient_email'.
     """
+    # Get the directory where this script is located
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    
     # Email configuration
     sender = "newsletter@homesmartify.lu"
     sender_password = os.environ.get("EMAIL_PASSWORD")  # or app-specific password
@@ -126,7 +129,7 @@ def send_welcome_email_to_user(recipient_email):
                   <div class="content-box">
                     <h2 class="welcome-title">Welcome Aboard!</h2>
                     <p class="intro-text">
-                      We’re excited to bring you the latest insights, breakthroughs, and trends in artificial intelligence — from cutting-edge research and enterprise adoption to the real-world impact of AI on how we live, work, and learn.
+                      We're excited to bring you the latest insights, breakthroughs, and trends in artificial intelligence — from cutting-edge research and enterprise adoption to the real-world impact of AI on how we live, work, and learn.
                     </p>
                     <p class="intro-text">
                       To manage your subscription preferences or unsubscribe at any time, please visit:
@@ -172,10 +175,10 @@ def send_welcome_email_to_user(recipient_email):
     # Load icon from the static folder
     # Define the images to attach with their corresponding CIDs.
     images = {
-        'company_logo': 'static/company_logo.png',
-        'phone_icon': 'static/phone.png',
-        'email_icon': 'static/mail.png',
-        'web_icon': 'static/web.png'
+        'company_logo': os.path.join(script_dir, 'static', 'company_logo.png'),
+        'phone_icon': os.path.join(script_dir, 'static', 'phone.png'),
+        'email_icon': os.path.join(script_dir, 'static', 'mail.png'),
+        'web_icon': os.path.join(script_dir, 'static', 'web.png')
     }
 
 

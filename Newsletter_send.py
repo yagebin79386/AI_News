@@ -9,7 +9,8 @@ from urllib.parse import urlparse
 import os
 from dotenv import load_dotenv
 
-
+# Define the base directory
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 class SendNewsletter:
     def __init__(self, db_config):
@@ -59,13 +60,13 @@ class SendNewsletter:
 
         # Define the images to attach with their corresponding CIDs.
         images = {
-            'company_logo': 'static/company_logo.png',
-            'phone_icon': 'static/phone.png',
-            'email_icon': 'static/mail.png',
-            'web_icon': 'static/web.png',
-            'copylink_icon':'static/link.png',
-            'twitter_icon':'static/twitter.png',
-            'whatsapp_icon':'static/whatsapp.png'
+            'company_logo': os.path.join(BASE_DIR, 'static', 'company_logo.png'),
+            'phone_icon': os.path.join(BASE_DIR, 'static', 'phone.png'),
+            'email_icon': os.path.join(BASE_DIR, 'static', 'mail.png'),
+            'web_icon': os.path.join(BASE_DIR, 'static', 'web.png'),
+            'copylink_icon': os.path.join(BASE_DIR, 'static', 'link.png'),
+            'twitter_icon': os.path.join(BASE_DIR, 'static', 'twitter.png'),
+            'whatsapp_icon': os.path.join(BASE_DIR, 'static', 'whatsapp.png')
         }
 
          # Attach each image as MIMEImage with the correct Content-ID
