@@ -14,6 +14,7 @@
       padding: 0;
       font-family: Arial, sans-serif;
       background: linear-gradient(135deg, #add8e6, #ffffe0);
+      color: #333333;
     }
     #container {
       max-width: 1000px;
@@ -175,6 +176,73 @@
       }
       .status-message {
         font-size: 13px;
+      }
+    }
+    /* Dark mode styles */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+        color: #e0e0e0;
+      }
+      #sidebar {
+        background: rgba(0, 87, 231, 0.15);
+      }
+      #sidebar h3 {
+        color: #4dabf7;
+      }
+      #sidebar a {
+        color: #e0e0e0;
+      }
+      #sidebar a:hover {
+        color: #4dabf7;
+      }
+      .content-box {
+        background: rgba(0, 87, 231, 0.15);
+      }
+      .content-box h2 {
+        color: #4dabf7;
+      }
+      label {
+        color: #e0e0e0;
+      }
+      input[type="email"], input[type="text"] {
+        background-color: #333333;
+        color: #e0e0e0;
+        border: 1px solid #444444;
+      }
+      input.verified-email {
+        color: #a0a0a0;
+      }
+      select {
+        background-color: #333333;
+        color: #e0e0e0;
+        border: 1px solid #444444;
+      }
+      button.preference-btn {
+        background: rgba(77, 171, 247, 0.2);
+        color: #e0e0e0;
+      }
+      button.preference-btn.selected {
+        background: #4dabf7;
+        color: #ffffff;
+      }
+      .status-message {
+        color: #4dabf7;
+      }
+      p {
+        color: #e0e0e0;
+      }
+    }
+    .newsletter-title {
+      font-size: 36px;
+      font-weight: bold;
+      color: #007AFF;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    @media (prefers-color-scheme: dark) {
+      .newsletter-title {
+        color: #4dabf7;
       }
     }
   </style>

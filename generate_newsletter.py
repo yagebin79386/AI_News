@@ -20,6 +20,9 @@ class NewsletterGenerator:
     """
 
     def __init__(self, db_config: dict, days_from_now: int):
+        # Get the directory where the script is located
+        self.script_dir = os.path.dirname(os.path.abspath(__file__))
+        
         self.conn = psycopg2.connect(
             dbname=db_config["dbname"],
             user=db_config["user"],
@@ -45,9 +48,28 @@ class NewsletterGenerator:
         self.top_title = ""
         self.newsletter_title = ""
 
+        # Image paths configuration using script directory
+        self.images = {
+            'company_logo': os.path.join(self.script_dir, 'static', 'company_logo.png'),
+            'twitter': os.path.join(self.script_dir, 'static', 'twitter.png'),
+            'link': os.path.join(self.script_dir, 'static', 'link.png'),
+            'whatsapp': os.path.join(self.script_dir, 'static', 'whatsapp.png'),
+            'phone': os.path.join(self.script_dir, 'static', 'phone.png'),
+            'mail': os.path.join(self.script_dir, 'static', 'mail.png'),
+            'web': os.path.join(self.script_dir, 'static', 'web.png')
+        }
+
         # Initialize OpenAI
         print(f"[DEBUG] NewsletterGenerator initialized. Date range: {self.start_date} to {self.current_date}")
+        print(f"[DEBUG] Script directory: {self.script_dir}")
+        print(f"[DEBUG] Image paths configured: {self.images}")
 
+    def get_image_path(self, image_key: str) -> str:
+        """
+        Get the path for an image based on its key.
+        Returns the path if it exists, otherwise returns a default image path.
+        """
+        return self.images.get(image_key, os.path.join(self.script_dir, 'static', 'default.png'))
 
     def fetch_top_articles(self):
         """
@@ -296,21 +318,21 @@ class NewsletterGenerator:
                 <td align="center" style="padding:5px;">
                     <a href="https://twitter.com/intent/tweet?url=YOUR_URL&text=Check%20this%20out!" 
                     target="_blank" style="text-decoration:none; color:#666666;">
-                    <img src="cid:twitter_icon" alt="Twitter" style="width:20px; height:20px;">
+                    <img src="{self.get_image_path('twitter')}" alt="Twitter" style="width:20px; height:20px;">
                     <span style="font-family:'Nunito', sans-serif; font-size:12px;">Twitter</span>
                     </a>
                 </td>
                 <!-- Copy Link Button -->
                 <td align="center" style="padding:5px;">
                     <a href="YOUR_URL" target="_blank" style="text-decoration:none; color:#666666;">
-                    <img src="cid:copylink_icon" alt="Copy Link" style="width:23px; height:23px;">
+                    <img src="{self.get_image_path('link')}" alt="Copy Link" style="width:23px; height:23px;">
                     <span style="font-family:'Nunito', sans-serif; font-size:12px;">Copy Link</span>
                     </a>
                 </td>
                 <!-- WhatsApp Share Button -->
                 <td align="center" style="padding:5px;">
                     <a href="https://api.whatsapp.com/send?text=YOUR_URL" target="_blank" style="text-decoration:none; color:#666666;">
-                    <img src="cid:whatsapp_icon" alt="WhatsApp" style="width:20px; height:20px;">
+                    <img src="{self.get_image_path('whatsapp')}" alt="WhatsApp" style="width:20px; height:20px;">
                     <span style="font-family:'Nunito', sans-serif; font-size:12px;">WhatsApp</span>
                     </a>
                 </td>
@@ -479,7 +501,7 @@ class NewsletterGenerator:
         # Redirect block
         redirect_html = f"""
         <div style="text-align:center; margin-top:20px;">
-        <p style="font-size:14px; font-family:'Poppins', sans-serif; color:#333333; margin-bottom:10px;">
+        <p class="redirect-text" style="font-size:14px; font-family:'Poppins', sans-serif; color:#333333; margin-bottom:10px;">
             Feel free to visit our website for more news and smart technologies possibilities!
         </p>
         <a href="{self.redirect_link}" target="_blank" style="text-decoration:none;">
@@ -504,7 +526,7 @@ class NewsletterGenerator:
         # Company logo
         company_logo_html = f"""
         <div class="logo-container">
-        <img src="cid:company_logo" alt="Company Logo" class="company-logo-img">
+        <img src="{self.get_image_path('company_logo')}" alt="Company Logo" class="company-logo-img">
         </div>
         """
 
@@ -512,17 +534,17 @@ class NewsletterGenerator:
         contact_html = f"""
         <div class="contact-container">
         <div class="contact-item">
-            <img src="cid:phone_icon" alt="Phone" class="contact-icon">
+            <img src="{self.get_image_path('phone')}" alt="Phone" class="contact-icon">
             <span class="contact-text">{self.contact.get('contact_phone','')}</span>
             <span style="font-size:14px;">|</span>
         </div>
         <div class="contact-item">
-            <img src="cid:email_icon" alt="Email" class="contact-icon">
+            <img src="{self.get_image_path('mail')}" alt="Email" class="contact-icon">
             <span class="contact-text">{self.contact.get('contact_mail','')}</span>
             <span style="font-size:14px;">|</span>
         </div>
         <div class="contact-item">
-            <img src="cid:web_icon" alt="Website" class="contact-icon">
+            <img src="{self.get_image_path('web')}" alt="Website" class="contact-icon">
             <span class="contact-text">{self.contact.get('contact_web','')}</span>
         </div>
         </div>
@@ -551,25 +573,139 @@ class NewsletterGenerator:
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Newsletter</title>
         <style type="text/css">
-            /* Default Style */
+            :root {{
+                --bg-color: linear-gradient(135deg, #add8e6, #ffffe0);
+                --text-color: #333333;
+                --title-color: #007AFF;
+                --welcome-color: #34C759;
+                --link-color: #34AADC;
+                --box-bg: rgba(255,255,255,0.3);
+                --footer-color: #666;
+            }}
+
+            @media (prefers-color-scheme: dark) {{
+                :root {{
+                    --bg-color: #1a1a1a;
+                    --text-color: #ffffff;
+                    --title-color: #4a9eff;
+                    --welcome-color: #4cd964;
+                    --link-color: #4a9eff;
+                    --box-bg: rgba(255,255,255,0.1);
+                    --footer-color: #a0a0a0;
+                    --big-title-color: #2563EB;
+                }}
+                body {{
+                    background: var(--bg-color) !important;
+                    color: var(--text-color) !important;
+                }}
+                .newsletter-title {{
+                    color: var(--big-title-color) !important;
+                }}
+                .top-news-header {{
+                    color: var(--welcome-color) !important;
+                }}
+                .article-title {{
+                    color: var(--title-color) !important;
+                }}
+                .article-summary {{
+                    color: var(--text-color) !important;
+                }}
+                .top-news-text {{
+                    color: var(--text-color) !important;
+                }}
+                .contact-text {{
+                    color: var(--text-color) !important;
+                }}
+                .subscribe-container {{
+                    color: var(--text-color) !important;
+                }}
+                .footer-container {{
+                    color: var(--footer-color) !important;
+                }}
+                button {{
+                    background: var(--link-color) !important;
+                    color: #ffffff !important;
+                }}
+                button:hover {{
+                    background: var(--title-color) !important;
+                }}
+                .welcome-title {{
+                    color: var(--big-title-color) !important;
+                }}
+            }}
+
+            body {{
+                margin: 0;
+                padding: 0;
+                font-family: Arial, sans-serif;
+                background: var(--bg-color);
+                color: var(--text-color);
+            }}
+            .newsletter-title {{
+                font-family: 'Titan One', sans-serif;
+                font-size: 36px;
+                color: var(--title-color);
+                text-align: center;
+                margin-bottom: 20px;
+            }}
+            .welcome-title {{
+                font-family: 'Poppins', sans-serif;
+                font-size: 30px;
+                color: var(--welcome-color);
+                text-align: center;
+                margin: 0 auto 20px auto;
+            }}
+            .intro-text {{
+                font-family: 'Nunito', sans-serif;
+                font-size: 16px;
+                color: var(--text-color);
+                margin: 0 40px 20px;
+                max-width: 700px;
+                text-align: left;
+                line-height: 1.6;
+            }}
+            .content-box {{
+                background: var(--box-bg);
+                border-radius: 12px;
+                padding: 20px;
+                margin: 20px auto 20px auto;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            }}
+            .article-title {{
+                font-family: 'Poppins', sans-serif;
+                font-size: 20px;
+                color: var(--title-color);
+                margin: 10px 35px;
+                text-align: center;
+            }}
+            .article-summary {{
+                font-family: 'Nunito', sans-serif;
+                font-size: 14px;
+                color: var(--text-color);
+                margin-bottom: 20px;
+                text-align: left;
+            }}
             .top-news-header {{
                 text-align: center;
-                color: #0057e7;
+                color: var(--title-color);
                 font-family: 'Titan One', sans-serif;
                 font-size: 28px;
                 letter-spacing: 2px;
                 margin-bottom: 10px;
             }}
-            .logo-container {{
-                text-align: center;
-                margin-bottom: 10px;
+            button {{
+                padding: 6px 12px;
+                background: var(--link-color);
+                color: #ffffff;
+                border: none;
+                border-radius: 20px;
+                cursor: pointer;
+                font-size: 12px;
+                font-family: 'Poppins', sans-serif;
+                transition: background-color 0.2s;
             }}
-            .company-logo-img {{
-                display: block;
-                width: 140px;
-                max-width: 140px;
-                height: auto;
-                margin: 0 auto;
+            button:hover {{
+                background: var(--title-color);
             }}
             .contact-container {{
                 display: flex;
@@ -589,35 +725,41 @@ class NewsletterGenerator:
             }}
             .contact-text {{
                 font-size: 14px;
-                color: #666666;
+                color: var(--text-color);
             }}
             .subscribe-container {{
                 text-align: center;
                 font-size: 14px;
                 font-style: italic;
-                color: #666666;
+                color: var(--text-color);
                 margin: 25px 0;
             }}
             .footer-container {{
                 text-align: center;
                 font-size: 12px;
-                color: #666666;
+                color: var(--footer-color);
                 margin-top: 20px;
                 line-height: 1.4;
             }}
-
-            /* Mobile Styles */
             @media only screen and (max-width: 600px) {{
+                .newsletter-title {{
+                    font-size: 28px !important;
+                }}
+                .welcome-title {{
+                    font-size: 26px !important;
+                }}
+                .intro-text {{
+                    font-size: 20px !important;
+                    margin: 0 20px 15px !important;
+                }}
+                .article-title {{
+                    font-size: 32px !important;
+                }}
+                .article-summary {{
+                    font-size: 26px !important;
+                }}
                 .top-news-header {{
-                    font-size: 36px !important;  
-                }}
-                .company-logo-img {{
-                    width: 150px !important;
-                    max-width: 150px !important;
-                }}
-                .contact-container {{
-                    flex-direction: column;
-                    gap: 10px;
+                    font-size: 36px !important;
                 }}
                 .contact-text {{
                     font-size: 20px !important;
@@ -632,103 +774,85 @@ class NewsletterGenerator:
                 .footer-container {{
                     font-size: 18px !important;
                 }}
-                .head-container * {{
-                    font-size: 26px;
-                }}
-                .main-container * {{    
-                    font-size: 26px !important;
-                }}
-                .newsletter_title {{
-                    font-size: 36px !important;
-                    margin:0 30px 20px 30px !important;
-                }}
-                .newsletter_intro {{
-                    font-size: 28px !important;
-                }}
-                .article-title {{
-                    font-size: 32px !important;
-                }}
-                .article-summary {{ 
-                    font-size: 26px !important;
-                }}
-                .top-news-title {{ 
-                    font-size: 32px !important;
-                }}
-                .top-news-text {{
-                    font-size: 26px !important;
-                }}
-                .newsletter {{ 
-                    font-size: 45px !important;
-                }}
-                .issue-info-block * {{
-                    font-size: 26px !important; 
-                }}
-                .issue-info-block img {{
-                    width: 40px !important; 
-                    height: auto !important;
-                }}
             }}
         </style>
         </head>
-        <body style="margin:0; padding:0; background:linear-gradient(135deg, #add8e6, #ffffe0); font-family:'Nunito', sans-serif;">
-
-        <!-- Outer table for full width background -->
-        <table width="100%" border="0" cellspacing="0" cellpadding="0" align="center" style="background: linear-gradient(135deg, #add8e6, #ffffe0);">
+        <body style="background:var(--bg-color); font-family:'Nunito', Arial, sans-serif;">
+        <table width="100%" cellspacing="0" cellpadding="0">
             <tr>
-            <td align="center" valign="top">
-
-                <!-- Nested table to constrain width & center the newsletter -->
-                <table width="600" border="0" cellspacing="0" cellpadding="0" align="center" style="border-spacing:0; border-collapse:collapse;">
-                <tr>
-                    <td align="center" valign="top" style="padding:20px;">
-
-                    <!-- HEAD Container -->
-                    <table class="head-container" width="100%" border="0" cellspacing="0" cellpadding="0" align="center"
-                            style="background: rgba(0, 87, 231, 0.1); border-radius:12px; margin-bottom:20px;">
+                <td align="center">
+                    <table width="600" cellpadding="0" cellspacing="0" style="border-spacing:0; border-collapse:collapse;">
                         <tr>
-                        <td style="padding:20px;">
-                            {head_area_html}
-                        </td>
+                            <td align="center" style="padding:20px;">
+                                <!-- HEADER AREA -->
+                                <table width="100%" style="background:var(--box-bg); border-radius:12px; padding:20px;">
+                                    <tr>
+                                        <td align="center" class="newsletter-title">
+                                            DEEPTECH DIGEST
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <!-- MAIN CONTENT -->
+                                <div class="content-box">
+                                    <h2 class="welcome-title">{newsletter_title}</h2>
+                                    <p class="intro-text">{introduction}</p>
+                                    
+                                    <!-- Articles -->
+                                    {article_blocks}
+                                    
+                                    <!-- Top News -->
+                                    <div class="top-news-header">TOP NEWS!</div>
+                                    {top_news_html}
+                                    
+                                    <!-- Redirect -->
+                                    <div style="text-align:center; margin-top:20px;">
+                                        <p class="intro-text">
+                                            Feel free to visit our website for more news and smart technologies possibilities!
+                                        </p>
+                                        <a href="{self.redirect_link}" target="_blank" style="text-decoration:none;">
+                                            <button>Explore More</button>
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!-- COMPANY LOGO -->
+                                <div style="text-align:center !important; margin-bottom:10px;">
+                                    <img src="{self.get_image_path('company_logo')}" alt="Company Logo" style="display:block; width:140px !important; height:auto; margin:0 auto;">
+                                </div>
+
+                                <!-- CONTACT AREA -->
+                                <div style="text-align:center; margin-top:20px;">
+                                    <div class="contact-container">
+                                        <div class="contact-item">
+                                            <img src="{self.get_image_path('phone')}" alt="Phone" class="contact-icon">
+                                            <span class="contact-text">{self.contact.get('contact_phone','')}</span>
+                                            <span style="font-size:14px; color:var(--text-color);">|</span>
+                                        </div>
+                                        <div class="contact-item">
+                                            <img src="{self.get_image_path('mail')}" alt="Email" class="contact-icon">
+                                            <span class="contact-text">{self.contact.get('contact_mail','')}</span>
+                                            <span style="font-size:14px; color:var(--text-color);">|</span>
+                                        </div>
+                                        <div class="contact-item">
+                                            <img src="{self.get_image_path('web')}" alt="Website" class="contact-icon">
+                                            <span class="contact-text">{self.contact.get('contact_web','')}</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- FOOTER -->
+                                    <div class="footer-container">
+                                        &copy; 2025 HomeSmartify.lu<br>
+                                        Transforming Technology: Where Smart Technology Meets Caring Comfort.<br>
+                                        Luxembourg City, Luxembourg 1329
+                                    </div>
+                                </div>
+                            </td>
                         </tr>
                     </table>
-
-                    <!-- MAIN Container -->
-                    <table class="main-container" width="100%" border="0" cellspacing="0" cellpadding="0" align="center"
-                            style="background: rgba(0, 87, 231, 0.1); border-radius:12px; margin-bottom:20px;">
-                        <tr>
-                        <td style="padding:20px;">
-                            {intro_html}
-                            <hr style="border:none; border-top:2px solid #0057e7; margin:20px 0;">
-                            {article_blocks}
-                            <hr style="border:none; border-top:2px solid #0057e7; margin:40px 0;">
-                            {top_news_header_html}
-                            {top_news_html}
-                            {redirect_html}
-                        </td>
-                        </tr>
-                    </table>
-
-                    <!-- TAIL Container -->
-                    <table class="tail-container" width="100%" border="0" cellspacing="0" cellpadding="0" align="center"
-                            style="background: rgba(0, 87, 231, 0.1); border-radius:12px;">
-                        <tr>
-                        <td style="padding:20px;">
-                            {company_logo_html}
-                            {contact_html}
-                            {subscribe_html}
-                            {company_footer_html}
-                        </td>
-                        </tr>
-                    </table>
-
-                    </td>
-                </tr>
-                </table>
-
-            </td>
+                </td>
             </tr>
         </table>
-
         </body>
         </html>
         """

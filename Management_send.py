@@ -56,44 +56,77 @@ def send_subs_management_email_to_user(recipient_email):
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Manage Your DeepTech Digest Newsletter</title>
       <style type="text/css">
+        :root {{
+          --bg-color: linear-gradient(135deg, #add8e6, #ffffe0);
+          --text-color: #333333;
+          --title-color: #007AFF;
+          --welcome-color: #34C759;
+          --link-color: #34AADC;
+          --box-bg: rgba(255,255,255,0.3);
+          --footer-color: #666;
+        }}
+
+        @media (prefers-color-scheme: dark) {{
+          :root {{
+            --bg-color: #1a1a1a;
+            --text-color: #ffffff;
+            --title-color: #4a9eff;
+            --welcome-color: #4cd964;
+            --link-color: #4a9eff;
+            --box-bg: rgba(255,255,255,0.1);
+            --footer-color: #a0a0a0;
+          }}
+        }}
+
         body {{
           margin: 0;
           padding: 0;
           font-family: Arial, sans-serif;
-          background: linear-gradient(135deg, #add8e6, #ffffe0);
-          color: #333333;
+          background: var(--bg-color);
+          color: var(--text-color);
         }}
         .newsletter-title {{
           font-family: 'Titan One', sans-serif;
           font-size: 36px;
-          color: #007AFF;
+          color: var(--title-color);
           text-align: center;
           margin-bottom: 20px;
         }}
         .welcome-title {{
           font-family: 'Poppins', sans-serif;
           font-size: 30px;
-          color: #34C759;
+          color: var(--welcome-color);
           text-align: center;
           margin: 0 auto 20px auto;
         }}
         .intro-text {{
           font-family: 'Nunito', sans-serif;
           font-size: 16px;
-          color: #333;
+          color: var(--text-color);
           margin: 0 40px 20px;
           max-width: 700px;
           text-align: left;
+          line-height: 1.6;
         }}
         a.manage-link {{
-          color: #34AADC;
+          color: var(--link-color);
           text-decoration: none;
+          font-weight: bold;
+          padding: 8px 16px;
+          background: rgba(74, 158, 255, 0.1);
+          border-radius: 6px;
+          transition: all 0.3s ease;
+        }}
+        a.manage-link:hover {{
+          background: rgba(74, 158, 255, 0.2);
+          text-decoration: underline;
         }}
         .content-box {{
-          background: rgba(255,255,255,0.3);
+          background: var(--box-bg);
           border-radius: 12px;
           padding: 20px;
           margin: 20px auto 20px auto;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }}
         @media only screen and (max-width: 600px) {{
           .newsletter-title {{
@@ -112,7 +145,7 @@ def send_subs_management_email_to_user(recipient_email):
         }}
       </style>
     </head>
-    <body style="background:linear-gradient(135deg, #add8e6, #ffffe0); font-family:'Nunito', Arial, sans-serif;">
+    <body style="background:var(--bg-color); font-family:'Nunito', Arial, sans-serif;">
       <table width="100%" cellspacing="0" cellpadding="0">
         <tr>
           <td align="center">
@@ -120,7 +153,7 @@ def send_subs_management_email_to_user(recipient_email):
               <tr>
                 <td align="center" style="padding:20px;">
                   <!-- HEADER AREA -->
-                  <table width="100%" style="background:rgba(255,255,255,0.3); border-radius:12px; padding:20px;">
+                  <table width="100%" style="background:var(--box-bg); border-radius:12px; padding:20px;">
                     <tr>
                       <td align="center" class="newsletter-title">
                         Manage your DeepTech Digest subscription
@@ -145,16 +178,16 @@ def send_subs_management_email_to_user(recipient_email):
                   <div style="text-align:center; margin-top:20px;">
                     <div style="display:flex; justify-content:center; gap:15px;">
                       <img src="cid:phone_icon" alt="Phone" style="width:20px; height:20px;">
-                      <span style="font-size:14px;">{contact['contact_phone']}</span>
-                      <span style="font-size:14px;">|</span>
+                      <span style="font-size:14px; color:var(--text-color);">{contact['contact_phone']}</span>
+                      <span style="font-size:14px; color:var(--text-color);">|</span>
                       <img src="cid:email_icon" alt="Email" style="width:20px; height:20px;">
-                      <span style="font-size:14px;">{contact.get('contact_mail','')}</span>
-                      <span style="font-size:14px;">|</span>
+                      <span style="font-size:14px; color:var(--text-color);">{contact.get('contact_mail','')}</span>
+                      <span style="font-size:14px; color:var(--text-color);">|</span>
                       <img src="cid:web_icon" alt="Website" style="width:20px; height:20px;">
-                      <span style="font-size:14px;">{contact.get('contact_web','')}</span>
+                      <span style="font-size:14px; color:var(--text-color);">{contact.get('contact_web','')}</span>
                     </div>
                     <!-- FOOTER AREA -->
-                    <div class="company-footer" style="text-align:center; font-size:12px; color:#666; margin-top:15px;">
+                    <div class="company-footer" style="text-align:center; font-size:12px; color:var(--footer-color); margin-top:15px;">
                       &copy; 2025 HomeSmartify.lu<br>
                       Transforming Technology: Where Smart Technology Meets Caring Comfort.<br>
                       Luxembourg City, Luxembourg 1329

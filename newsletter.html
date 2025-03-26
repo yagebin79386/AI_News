@@ -5,25 +5,139 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Newsletter</title>
         <style type="text/css">
-            /* Default Style */
+            :root {
+                --bg-color: linear-gradient(135deg, #add8e6, #ffffe0);
+                --text-color: #333333;
+                --title-color: #007AFF;
+                --welcome-color: #34C759;
+                --link-color: #34AADC;
+                --box-bg: rgba(255,255,255,0.3);
+                --footer-color: #666;
+            }
+
+            @media (prefers-color-scheme: dark) {
+                :root {
+                    --bg-color: #1a1a1a;
+                    --text-color: #ffffff;
+                    --title-color: #4a9eff;
+                    --welcome-color: #4cd964;
+                    --link-color: #4a9eff;
+                    --box-bg: rgba(255,255,255,0.1);
+                    --footer-color: #a0a0a0;
+                    --big-title-color: #2563EB;
+                }
+                body {
+                    background: var(--bg-color) !important;
+                    color: var(--text-color) !important;
+                }
+                .newsletter-title {
+                    color: var(--big-title-color) !important;
+                }
+                .top-news-header {
+                    color: var(--welcome-color) !important;
+                }
+                .article-title {
+                    color: var(--title-color) !important;
+                }
+                .article-summary {
+                    color: var(--text-color) !important;
+                }
+                .top-news-text {
+                    color: var(--text-color) !important;
+                }
+                .contact-text {
+                    color: var(--text-color) !important;
+                }
+                .subscribe-container {
+                    color: var(--text-color) !important;
+                }
+                .footer-container {
+                    color: var(--footer-color) !important;
+                }
+                button {
+                    background: var(--link-color) !important;
+                    color: #ffffff !important;
+                }
+                button:hover {
+                    background: var(--title-color) !important;
+                }
+                .welcome-title {
+                    color: var(--big-title-color) !important;
+                }
+            }
+
+            body {
+                margin: 0;
+                padding: 0;
+                font-family: Arial, sans-serif;
+                background: var(--bg-color);
+                color: var(--text-color);
+            }
+            .newsletter-title {
+                font-family: 'Titan One', sans-serif;
+                font-size: 36px;
+                color: var(--title-color);
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            .welcome-title {
+                font-family: 'Poppins', sans-serif;
+                font-size: 30px;
+                color: var(--welcome-color);
+                text-align: center;
+                margin: 0 auto 20px auto;
+            }
+            .intro-text {
+                font-family: 'Nunito', sans-serif;
+                font-size: 16px;
+                color: var(--text-color);
+                margin: 0 40px 20px;
+                max-width: 700px;
+                text-align: left;
+                line-height: 1.6;
+            }
+            .content-box {
+                background: var(--box-bg);
+                border-radius: 12px;
+                padding: 20px;
+                margin: 20px auto 20px auto;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            }
+            .article-title {
+                font-family: 'Poppins', sans-serif;
+                font-size: 20px;
+                color: var(--title-color);
+                margin: 10px 35px;
+                text-align: center;
+            }
+            .article-summary {
+                font-family: 'Nunito', sans-serif;
+                font-size: 14px;
+                color: var(--text-color);
+                margin-bottom: 20px;
+                text-align: left;
+            }
             .top-news-header {
                 text-align: center;
-                color: #0057e7;
+                color: var(--title-color);
                 font-family: 'Titan One', sans-serif;
                 font-size: 28px;
                 letter-spacing: 2px;
                 margin-bottom: 10px;
             }
-            .logo-container {
-                text-align: center;
-                margin-bottom: 10px;
+            button {
+                padding: 6px 12px;
+                background: var(--link-color);
+                color: #ffffff;
+                border: none;
+                border-radius: 20px;
+                cursor: pointer;
+                font-size: 12px;
+                font-family: 'Poppins', sans-serif;
+                transition: background-color 0.2s;
             }
-            .company-logo-img {
-                display: block;
-                width: 140px;
-                max-width: 140px;
-                height: auto;
-                margin: 0 auto;
+            button:hover {
+                background: var(--title-color);
             }
             .contact-container {
                 display: flex;
@@ -43,35 +157,41 @@
             }
             .contact-text {
                 font-size: 14px;
-                color: #666666;
+                color: var(--text-color);
             }
             .subscribe-container {
                 text-align: center;
                 font-size: 14px;
                 font-style: italic;
-                color: #666666;
+                color: var(--text-color);
                 margin: 25px 0;
             }
             .footer-container {
                 text-align: center;
                 font-size: 12px;
-                color: #666666;
+                color: var(--footer-color);
                 margin-top: 20px;
                 line-height: 1.4;
             }
-
-            /* Mobile Styles */
             @media only screen and (max-width: 600px) {
+                .newsletter-title {
+                    font-size: 28px !important;
+                }
+                .welcome-title {
+                    font-size: 26px !important;
+                }
+                .intro-text {
+                    font-size: 20px !important;
+                    margin: 0 20px 15px !important;
+                }
+                .article-title {
+                    font-size: 32px !important;
+                }
+                .article-summary {
+                    font-size: 26px !important;
+                }
                 .top-news-header {
-                    font-size: 36px !important;  
-                }
-                .company-logo-img {
-                    width: 150px !important;
-                    max-width: 150px !important;
-                }
-                .contact-container {
-                    flex-direction: column;
-                    gap: 10px;
+                    font-size: 36px !important;
                 }
                 .contact-text {
                     font-size: 20px !important;
@@ -86,145 +206,32 @@
                 .footer-container {
                     font-size: 18px !important;
                 }
-                .head-container * {
-                    font-size: 26px;
-                }
-                .main-container * {    
-                    font-size: 26px !important;
-                }
-                .newsletter_title {
-                    font-size: 36px !important;
-                    margin:0 30px 20px 30px !important;
-                }
-                .newsletter_intro {
-                    font-size: 28px !important;
-                }
-                .article-title {
-                    font-size: 32px !important;
-                }
-                .article-summary { 
-                    font-size: 26px !important;
-                }
-                .top-news-title { 
-                    font-size: 32px !important;
-                }
-                .top-news-text {
-                    font-size: 26px !important;
-                }
-                .newsletter { 
-                    font-size: 45px !important;
-                }
-                .issue-info-block * {
-                    font-size: 26px !important; 
-                }
-                .issue-info-block img {
-                    width: 40px !important; 
-                    height: auto !important;
-                }
             }
         </style>
         </head>
-        <body style="margin:0; padding:0; background:linear-gradient(135deg, #add8e6, #ffffe0); font-family:'Nunito', sans-serif;">
-
-        <!-- Outer table for full width background -->
-        <table width="100%" border="0" cellspacing="0" cellpadding="0" align="center" style="background: linear-gradient(135deg, #add8e6, #ffffe0);">
+        <body style="background:var(--bg-color); font-family:'Nunito', Arial, sans-serif;">
+        <table width="100%" cellspacing="0" cellpadding="0">
             <tr>
-            <td align="center" valign="top">
-
-                <!-- Nested table to constrain width & center the newsletter -->
-                <table width="600" border="0" cellspacing="0" cellpadding="0" align="center" style="border-spacing:0; border-collapse:collapse;">
-                <tr>
-                    <td align="center" valign="top" style="padding:20px;">
-
-                    <!-- HEAD Container -->
-                    <table class="head-container" width="100%" border="0" cellspacing="0" cellpadding="0" align="center"
-                            style="background: rgba(0, 87, 231, 0.1); border-radius:12px; margin-bottom:20px;">
+                <td align="center">
+                    <table width="600" cellpadding="0" cellspacing="0" style="border-spacing:0; border-collapse:collapse;">
                         <tr>
-                        <td style="padding:20px;">
-                            
-        <!-- HEAD Area Table -->
-        <table width="100%" border="0" cellspacing="0" cellpadding="0" 
-            style="background: rgba(0, 87, 231, 0); border-radius:12px;">
-        <!-- Top row: Issue info (left) and share buttons (right) -->
-        <tr class="issue-info-block">
-            <td align="left" style="font-family: 'Roboto Condensed', sans-serif; font-size: 13px; color: #666666; padding:0 0 20px 0;">
-            Issue No.5 Edition 1<br>
-            Current Date: 2025-03-24
-            </td>
-            <td align="right" style="vertical-align:top;">
-            <table border="0" cellspacing="0" cellpadding="0">
-                <tr>
-                <!-- Twitter Share Button -->
-                <td align="center" style="padding:5px;">
-                    <a href="https://twitter.com/intent/tweet?url=YOUR_URL&text=Check%20this%20out!" 
-                    target="_blank" style="text-decoration:none; color:#666666;">
-                    <img src="cid:twitter_icon" alt="Twitter" style="width:20px; height:20px;">
-                    <span style="font-family:'Nunito', sans-serif; font-size:12px;">Twitter</span>
-                    </a>
-                </td>
-                <!-- Copy Link Button -->
-                <td align="center" style="padding:5px;">
-                    <a href="YOUR_URL" target="_blank" style="text-decoration:none; color:#666666;">
-                    <img src="cid:copylink_icon" alt="Copy Link" style="width:23px; height:23px;">
-                    <span style="font-family:'Nunito', sans-serif; font-size:12px;">Copy Link</span>
-                    </a>
-                </td>
-                <!-- WhatsApp Share Button -->
-                <td align="center" style="padding:5px;">
-                    <a href="https://api.whatsapp.com/send?text=YOUR_URL" target="_blank" style="text-decoration:none; color:#666666;">
-                    <img src="cid:whatsapp_icon" alt="WhatsApp" style="width:20px; height:20px;">
-                    <span style="font-family:'Nunito', sans-serif; font-size:12px;">WhatsApp</span>
-                    </a>
-                </td>
-                </tr>
-            </table>
-            </td>
-        </tr>
-        <!-- Second row: Newsletter title -->
-        <tr>
-            <td class="newsletter" colspan="2" align="center" 
-                style="font-family: 'Poppins', sans-serif; letter-spacing: 2px; font-size:38px; color:#0057e7; text-transform:uppercase; padding:20px 0;">
-            DEEPTECH DIGEST
-            </td>
-        </tr>
-        </table>
-        
-                        </td>
-                        </tr>
-                    </table>
+                            <td align="center" style="padding:20px;">
+                                <!-- HEADER AREA -->
+                                <table width="100%" style="background:var(--box-bg); border-radius:12px; padding:20px;">
+                                    <tr>
+                                        <td align="center" class="newsletter-title">
+                                            DEEPTECH DIGEST
+                                        </td>
+                                    </tr>
+                                </table>
 
-                    <!-- MAIN Container -->
-                    <table class="main-container" width="100%" border="0" cellspacing="0" cellpadding="0" align="center"
-                            style="background: rgba(0, 87, 231, 0.1); border-radius:12px; margin-bottom:20px;">
-                        <tr>
-                        <td style="padding:20px;">
-                            
-        <div style="margin-bottom:20px;">
-        <h2 class="newsletter_title" style="
-            display:block;
-            font-family:'Poppins', sans-serif;
-            font-size:22px; 
-            color:#0057e7; 
-            margin:0 auto 20px auto; 
-            text-align:center; 
-            max-width:600px;
-        ">
-            Tech Talk Chronicles: AI Adventures and Quantum Quandaries
-        </h2>
-        <p class="newsletter_intro" style="
-            font-size:16px;
-            font-family:'Nunito', sans-serif;
-            color:#333333; 
-            margin:0 30px 40px 30px; 
-            max-width:700px; 
-            text-align:left;
-        ">
-            Hey there tech enthusiasts! Are you ready to dive into a whirlwind of cutting-edge discoveries and thought-provoking dilemmas? Our latest edition delves into the dynamic world of AI and quantum computing, where innovation meets controversy in fascinating ways. From the evolving role of software engineers in harnessing AI's power to the creative possibilities of Apple's Image Playground, we're taking you on a wild ride through the tech landscape.
-        </p>
-        </div>
-        
-                            <hr style="border:none; border-top:2px solid #0057e7; margin:20px 0;">
-                            
+                                <!-- MAIN CONTENT -->
+                                <div class="content-box">
+                                    <h2 class="welcome-title">Tech Tidbits: AI, Thermodynamic Computing, and the Quantum Apocalypse</h2>
+                                    <p class="intro-text">Hey there, tech enthusiasts! Welcome to our latest newsletter edition where we delve into the cutting-edge world of AI, thermodynamic computing, and the looming quantum apocalypse. Have you ever wondered how software engineers are actually using AI in their everyday work? Are you curious about the potential of thermodynamic chips to revolutionize the computing landscape? And are you ready to face the upcoming quantum apocalypse and its implications on global cybersecurity? Buckle up, because we have some mind-blowing insights to share with you!</p>
+                                    
+                                    <!-- Articles -->
+                                    
         <div style="margin:0 20px; padding:10px;">
         <h3 class="article-title" style="
             font-size:20px;
@@ -280,53 +287,6 @@
             margin:10px 35px 10px 35px; 
             text-align:center;
         ">
-            How to Use Apple’s Image Playground to Generate AI Art
-        </h3>
-        <p class="publication-date" style="
-            font-size:14px;
-            font-family:'Nunito', sans-serif;
-            color:#666666;
-            text-align:center;
-            margin-bottom:10px;
-        ">
-            2025-03-23
-        </p>
-        <p class="article-summary" style="
-            font-family:'Nunito', sans-serif;
-            font-size:14px; 
-            color:#333333; 
-            margin-bottom:20px; 
-            text-align:left;
-        ">
-            Apple has introduced Image Playground, a new AI-powered art generation app, as part of its latest updates to iOS, iPadOS, and macOS. This innovative tool allows users to transform text prompts into creative images, offering endless possibilities for digital art creation. Whether you're crafting a unique background for an invitation or creating a cartoon version of your pet, Image Playground makes it accessible and fun. This development highlights Apple's commitment to integrating AI into everyday life, enhancing creativity and personalization for users across its devices.
-        </p>
-        <div style="text-align:center;">
-            <a href="https://www.wired.com/story/how-to-use-apples-image-playground-to-generate-ai-art/" target="_blank" style="text-decoration:none;">
-            <button style="
-                padding:6px 12px; 
-                background:#0057e7; 
-                color:#ffffff; 
-                border:none; 
-                border-radius:20px; 
-                cursor:pointer;
-                font-size:12px;
-                font-family:'Poppins', sans-serif;
-                transition: background-color 0.2s;
-            ">
-                READ MORE (2 mins)
-            </button>
-            </a>
-        </div>
-        </div>
-        
-        <div style="margin:0 20px; padding:10px;">
-        <h3 class="article-title" style="
-            font-size:20px;
-            font-family:'Poppins', sans-serif;
-            color:#0057e7; 
-            margin:10px 35px 10px 35px; 
-            text-align:center;
-        ">
             Hot New Thermodynamic Chips Could Trump Classical Computers
         </h3>
         <p class="publication-date" style="
@@ -366,60 +326,10 @@
         </div>
         </div>
         
-        <div style="margin:0 20px; padding:10px;">
-        <h3 class="article-title" style="
-            font-size:20px;
-            font-family:'Poppins', sans-serif;
-            color:#0057e7; 
-            margin:10px 35px 10px 35px; 
-            text-align:center;
-        ">
-            OpenAI’s Sora Is Plagued by Sexist, Racist, and Ableist Biases
-        </h3>
-        <p class="publication-date" style="
-            font-size:14px;
-            font-family:'Nunito', sans-serif;
-            color:#666666;
-            text-align:center;
-            margin-bottom:10px;
-        ">
-            2025-03-23
-        </p>
-        <p class="article-summary" style="
-            font-family:'Nunito', sans-serif;
-            font-size:14px; 
-            color:#333333; 
-            margin-bottom:20px; 
-            text-align:left;
-        ">
-            A recent investigation by WIRED has highlighted the persistent biases in AI-generated videos, particularly those created by OpenAI's Sora. Despite advancements in image quality, these tools continue to perpetuate sexist, racist, and ableist stereotypes, reflecting and amplifying societal biases present in their training data. OpenAI acknowledges the issue and is working on reducing bias, but the challenge remains significant across the industry. The implications are profound, especially as AI video finds commercial applications in advertising and potentially in security systems, where biased portrayals could lead to real-world harm. This underscores the urgent need for ethical governance and improved training methodologies in AI development.
-        </p>
-        <div style="text-align:center;">
-            <a href="https://www.wired.com/story/openai-sora-video-generator-bias/" target="_blank" style="text-decoration:none;">
-            <button style="
-                padding:6px 12px; 
-                background:#0057e7; 
-                color:#ffffff; 
-                border:none; 
-                border-radius:20px; 
-                cursor:pointer;
-                font-size:12px;
-                font-family:'Poppins', sans-serif;
-                transition: background-color 0.2s;
-            ">
-                READ MORE (3 mins)
-            </button>
-            </a>
-        </div>
-        </div>
-        
-                            <hr style="border:none; border-top:2px solid #0057e7; margin:40px 0;">
-                            
-        <div class="top-news-header">
-            TOP NEWS!
-        </div>
-        
-                            
+                                    
+                                    <!-- Top News -->
+                                    <div class="top-news-header">TOP NEWS!</div>
+                                    
         <div style="margin:0 20px 30px 20px; padding:10px;">
         <h3 class="top-news-title" style="
             font-family:'Poppins', sans-serif;
@@ -446,7 +356,7 @@
             margin-bottom:20px; 
             text-align:left;
         ">
-            The article explores how software engineers actually use AI and whether AI will eventually replace programming jobs. While some believe AI could potentially automate programming tasks and lead to job cuts, most experts dismiss this idea as unrealistic. AI is seen as a tool to enhance productivity and automate repetitive tasks, leaving room for human creativity and problem-solving. The article emphasizes the importance of adapting to the changes brought by AI in the programming industry.
+            The article explores how software engineers are using AI in their work and addresses the debate around whether AI will replace programming jobs. While some believe AI could potentially lead to job loss, most see it as a tool to enhance productivity rather than replacing human engineers. The article emphasizes the importance of adapting to technological changes in order to stay relevant in the field.
         </p>
         <div style="text-align:center;">
             <a href="https://www.wired.com/story/how-software-engineers-coders-actually-use-ai/" target="_blank" style="text-decoration:none;">
@@ -467,86 +377,55 @@
         </div>
         </div>
         
-                            
-        <div style="text-align:center; margin-top:20px;">
-        <p style="font-size:14px; font-family:'Poppins', sans-serif; color:#333333; margin-bottom:10px;">
-            Feel free to visit our website for more news and smart technologies possibilities!
-        </p>
-        <a href="https://www.homesmartify.lu" target="_blank" style="text-decoration:none;">
-            <button style="
-                padding:8px 16px; 
-                background:#0057e7; 
-                color:#ffffff; 
-                border:none; 
-                border-radius:20px; 
-                cursor:pointer; 
-                font-family:'Poppins', sans-serif; 
-                text-transform:uppercase; 
-                font-size:14px;
-                transition: background-color 0.2s;
-            ">
-                Explore More
-            </button>
-        </a>
-        </div>
-        
-                        </td>
+                                    
+                                    <!-- Redirect -->
+                                    <div style="text-align:center; margin-top:20px;">
+                                        <p class="intro-text">
+                                            Feel free to visit our website for more news and smart technologies possibilities!
+                                        </p>
+                                        <a href="https://www.homesmartify.lu" target="_blank" style="text-decoration:none;">
+                                            <button>Explore More</button>
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!-- COMPANY LOGO -->
+                                <div style="text-align:center !important; margin-bottom:10px;">
+                                    <img src="/Users/rickytan/Documents/Learn/Own project/News_AI/static/company_logo.png" alt="Company Logo" style="display:block; width:140px !important; height:auto; margin:0 auto;">
+                                </div>
+
+                                <!-- CONTACT AREA -->
+                                <div style="text-align:center; margin-top:20px;">
+                                    <div class="contact-container">
+                                        <div class="contact-item">
+                                            <img src="/Users/rickytan/Documents/Learn/Own project/News_AI/static/phone.png" alt="Phone" class="contact-icon">
+                                            <span class="contact-text">+352 661777082</span>
+                                            <span style="font-size:14px; color:var(--text-color);">|</span>
+                                        </div>
+                                        <div class="contact-item">
+                                            <img src="/Users/rickytan/Documents/Learn/Own project/News_AI/static/mail.png" alt="Email" class="contact-icon">
+                                            <span class="contact-text">info@homesmartify.lu</span>
+                                            <span style="font-size:14px; color:var(--text-color);">|</span>
+                                        </div>
+                                        <div class="contact-item">
+                                            <img src="/Users/rickytan/Documents/Learn/Own project/News_AI/static/web.png" alt="Website" class="contact-icon">
+                                            <span class="contact-text">https://www.homesmartify.lu</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- FOOTER -->
+                                    <div class="footer-container">
+                                        &copy; 2025 HomeSmartify.lu<br>
+                                        Transforming Technology: Where Smart Technology Meets Caring Comfort.<br>
+                                        Luxembourg City, Luxembourg 1329
+                                    </div>
+                                </div>
+                            </td>
                         </tr>
                     </table>
-
-                    <!-- TAIL Container -->
-                    <table class="tail-container" width="100%" border="0" cellspacing="0" cellpadding="0" align="center"
-                            style="background: rgba(0, 87, 231, 0.1); border-radius:12px;">
-                        <tr>
-                        <td style="padding:20px;">
-                            
-        <div class="logo-container">
-        <img src="cid:company_logo" alt="Company Logo" class="company-logo-img">
-        </div>
-        
-                            
-        <div class="contact-container">
-        <div class="contact-item">
-            <img src="cid:phone_icon" alt="Phone" class="contact-icon">
-            <span class="contact-text">+352 661777082</span>
-            <span style="font-size:14px;">|</span>
-        </div>
-        <div class="contact-item">
-            <img src="cid:email_icon" alt="Email" class="contact-icon">
-            <span class="contact-text">info@homesmartify.lu</span>
-            <span style="font-size:14px;">|</span>
-        </div>
-        <div class="contact-item">
-            <img src="cid:web_icon" alt="Website" class="contact-icon">
-            <span class="contact-text">https://www.homesmartify.lu</span>
-        </div>
-        </div>
-        
-                            
-        <div class="subscribe-container">
-        Update your email preferences or unsubscribe
-        <a href="https://newsletter.homesmartify.lu/?email={EMAIL}" target="_blank" rel="noopener nofollow">here</a>.
-        </div>
-        
-                            
-        <div class="footer-container">
-        &copy; 2025 HomeSmartify.lu<br>
-        Transforming Technology: Where Smart Technology Meets Caring Comfort.<br>
-        Luxembourg City, Luxembourg 1329
-        </div>
-        
-                        </td>
-                        </tr>
-                    </table>
-
-                    </td>
-                </tr>
-                </table>
-
-            </td>
+                </td>
             </tr>
         </table>
-
         </body>
         </html>
         
