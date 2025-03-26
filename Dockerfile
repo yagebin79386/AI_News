@@ -21,7 +21,7 @@ RUN apt-get update && apt-get install -y \
     --no-install-recommends \
  && rm -rf /var/lib/apt/lists/*
 
-# 2) Add Google’s official GPG key & repo
+# 2) Add Google's official GPG key & repo
 RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - \
  && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list
 
@@ -49,24 +49,37 @@ RUN touch /var/log/news_AI_send_app.log && chmod 644 /var/log/news_AI_send_app.l
 # Copy all project files into the container
 COPY . .
 
-# Example crontab lines for your scripts:
-#  - ScraperNewsLLM.py runs every hour at minute 0
-#  - generate_newsletter.py runs every hour at minute 5
-#  - Newsletter_send.py runs schedule
-    RUN echo "0 17 * * 1,3,5 /usr/local/bin/python3 /app/ScraperNewsLLM.py >> /var/log/news_AI_app.log 2>&1" >> /etc/cron.d/mycron
-    RUN echo "30 18 * * 1,3,5 /usr/local/bin/python3 /app/categorizationLLM.py >> /var/log/news_AI_categorization_app.log>&1" >> /etc/cron.d/mycron
-    RUN echo "20 19 * * 1,3,5 /usr/local/bin/python3 /app/evaluate_articles.py >> /var/log/news_AI_evaluation_app.log 2>&1" >> /etc/cron.d/mycron
-    RUN echo "30 19 * * 1,3,5 /usr/local/bin/python3 /app/generate_newsletter.py >> /var/log/news_AI_generate_app.log 2>&1" >> /etc/cron.d/mycron
-    RUN echo "00 20 * * 1,3,5 /usr/local/bin/python3 /app/Newsletter_send.py >> /var/log/news_AI_send_app.log>&1" >> /etc/cron.d/mycron
+# Create crontab file with proper line endings
+RUN echo "0 17 * * 1,3,5 root /usr/local/bin/python3 /app/ScraperNewsLLM.py >> /var/log/news_AI_scrape_app.log 2>&1" > /etc/cron.d/mycron
+RUN echo "30 18 * * 1,3,5 root /usr/local/bin/python3 /app/categorizationLLM.py >> /var/log/news_AI_categorization_app.log 2>&1" >> /etc/cron.d/mycron
+RUN echo "20 19 * * 1,3,5 root /usr/local/bin/python3 /app/evaluate_articles.py >> /var/log/news_AI_evaluation_app.log 2>&1" >> /etc/cron.d/mycron
+RUN echo "30 19 * * 1,3,5 root /usr/local/bin/python3 /app/generate_newsletter.py >> /var/log/news_AI_generate_app.log 2>&1" >> /etc/cron.d/mycron
+RUN echo "0 20 * * 1,3,5 root  /usr/local/bin/python3 /app/Newsletter_send.py >> /var/log/news_AI_send_app.log 2>&1" >> /etc/cron.d/mycron
 
 # Make the crontab file readable by cron, then register it
 RUN chmod 0644 /etc/cron.d/mycron
 RUN crontab /etc/cron.d/mycron
 
-# Copy in your Supervisor config (see next step)
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+# Create supervisor configuration
+RUN echo '[supervisord]\n\
+nodaemon=true\n\
+\n\
+[program:cron]\n\
+command=cron -f\n\
+autostart=true\n\
+autorestart=true\n\
+stdout_logfile=/var/log/cron.log\n\
+stderr_logfile=/var/log/cron.err.log\n\
+\n\
+[program:flask]\n\
+command=python3 subscriber_mgt.py\n\
+directory=/app\n\
+autostart=true\n\
+autorestart=true\n\
+stdout_logfile=/var/log/flask.log\n\
+stderr_logfile=/var/log/flask.err.log' > /etc/supervisor/conf.d/supervisord.conf
 
-# Expose the port your Flask app will run on (Fly.io expects 8080 by default)
+# Expose the port your Flask app will run on
 EXPOSE 8083
 
 # The main process: run Supervisor in the foreground
