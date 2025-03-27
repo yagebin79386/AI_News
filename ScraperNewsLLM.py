@@ -443,7 +443,7 @@ if __name__ == "__main__":
         "host": parsed_url.hostname,
     }
     scrapper = NewsScrapperGeneral(base_url, db_config)
-    scrapper.find_all_pagination_urls()
+#    scrapper.find_all_pagination_urls()
     scrapper.get_and_clean_html()
     scrapper.extract_news_articles_with_chatgpt()
     scrapper.flatten_news()
