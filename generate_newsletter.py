@@ -577,7 +577,7 @@ class NewsletterGenerator:
         subscribe_html = f"""
         <div class="subscribe-container">
         Update your email preferences or unsubscribe
-        <a href="https://www.ainewsletter.homesmartify.lu/?email={{EMAIL}}" target="_blank" rel="noopener nofollow">here</a>.
+        <a href="https://www.ainewsletter.homesmartify.lu/management/?email={{EMAIL}}" target="_blank" rel="noopener nofollow">here</a>.
         </div>
         """
 

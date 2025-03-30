@@ -9,52 +9,54 @@ primary_region = 'fra'
 [build]
 
 [http_service]
-  internal_port = 8083
+  # This should match the port Nginx is listening on (8085)
+  internal_port = 8085
   force_https = true
   auto_stop_machines = false
   auto_start_machines = true
   min_machines_running = 1
   processes = ['app']
-
-  # Base URL route (subscriber management)
-  [[http_service.routes]]
-    path = "/"
-    handlers = ["http"]
-    port = 8083
-
-  # Newsletter viewing route
-  [[http_service.routes]]
-    path = "/newsletter/*"
-    handlers = ["http"]
-    port = 8085
-
-[[services]]
-  protocol = "tcp"
-  internal_port = 8083
-  processes = ["app"]
-
-  [[services.ports]]
-    port = 8083
-    handlers = ["http"]
-
-  [[services.tcp_checks]]
+  
+  # Configure health checks
+  [http_service.concurrency]
+    type = "connections"
+    hard_limit = 250
+    soft_limit = 200
+  
+  [[http_service.checks]]
     interval = "15s"
-    timeout = "2s"
-    grace_period = "5s"
+    timeout = "5s"
+    grace_period = "120s"
+    method = "GET"
+    path = "/health"
+    protocol = "http"
 
 [[services]]
-  protocol = "tcp"
+  http_checks = []
   internal_port = 8085
   processes = ["app"]
+  protocol = "tcp"
+  script_checks = []
+  
+  [services.concurrency]
+    hard_limit = 250
+    soft_limit = 200
+    type = "connections"
 
   [[services.ports]]
-    port = 8085
+    force_https = true
     handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
 
   [[services.tcp_checks]]
-    interval = "15s"
-    timeout = "2s"
-    grace_period = "5s"
+    grace_period = "120s"
+    interval = "30s"
+    restart_limit = 0
+    timeout = "5s"
 
 [[vm]]
   memory = '1gb'

@@ -7,6 +7,7 @@ import psycopg2.extras
 import os
 from urllib.parse import urlparse
 from dotenv import load_dotenv
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 load_dotenv()
 
@@ -130,8 +131,14 @@ class DatabaseManager:
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
 
-# Set the application root to "/" since this is the main app at domain root
-app.config['APPLICATION_ROOT'] = '/'
+# Set the application root to "/management" for proper URL handling
+app.config['APPLICATION_ROOT'] = '/management'
+
+# Configure Flask to trust the proxy headers
+app.config['PREFERRED_URL_SCHEME'] = 'https'
+
+# This fixes the "Contradictory scheme headers" issue
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 db_url = os.environ.get("DATABASE_URL")
 if not db_url:
@@ -146,6 +153,17 @@ db_config = {
 
 db_manager = DatabaseManager(db_config)
 
+# Health check route for deployment monitoring
+@app.route("/health")
+def health_check():
+    """Simple health check endpoint for monitoring systems"""
+    try:
+        # Verify database connection is working
+        db_manager._ensure_connection()
+        return jsonify({"status": "healthy", "service": "subscriber_management"}), 200
+    except Exception as e:
+        print(f"Health check failed: {e}")
+        return jsonify({"status": "unhealthy", "error": str(e)}), 500
 
 @app.route("/", methods=["GET", "POST"])
 def subscribe_management():
@@ -812,8 +830,8 @@ def subscribe_management():
 
 if __name__ == "__main__":
     try:
-        # Use internal port 8084 to match the Nginx configuration
-        app.run(host="127.0.0.1", port=8084, debug=True)
+        # Use internal port 3000 to match the Nginx configuration
+        app.run(host="127.0.0.1", port=3000, debug=True)
     finally:
         # Close the persistent database connection when the server stops
         db_manager.conn.close()

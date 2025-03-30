@@ -40,17 +40,19 @@ WORKDIR /app
 
 # Copy and install dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
+    pip install --no-cache-dir -r requirements.txt || { echo "Pip install failed"; exit 1; }
 
 # Create symlink for python command
 RUN ln -sf /usr/local/bin/python3 /usr/local/bin/python
 
-# Create log file
-RUN touch /var/log/news_AI_scrape_app.log && chmod 644 /var/log/news_AI_scrape_app.log
-RUN touch /var/log/news_AI_categorization_app.log && chmod 644 /var/log/news_AI_categorization_app.log
-RUN touch /var/log/news_AI_evaluation_app.log && chmod 644 /var/log/news_AI_evaluation_app.log
-RUN touch /var/log/news_AI_generate_app.log && chmod 644 /var/log/news_AI_generate_app.log
-RUN touch /var/log/news_AI_send_app.log && chmod 644 /var/log/news_AI_send_app.log
+# Create log directories and files
+RUN mkdir -p /var/log/news_AI && \
+    touch /var/log/news_AI_scrape_app.log && chmod 644 /var/log/news_AI_scrape_app.log && \
+    touch /var/log/news_AI_categorization_app.log && chmod 644 /var/log/news_AI_categorization_app.log && \
+    touch /var/log/news_AI_evaluation_app.log && chmod 644 /var/log/news_AI_evaluation_app.log && \
+    touch /var/log/news_AI_generate_app.log && chmod 644 /var/log/news_AI_generate_app.log && \
+    touch /var/log/news_AI_send_app.log && chmod 644 /var/log/news_AI_send_app.log
 
 # Copy all project files into the container
 COPY . .
@@ -66,61 +68,101 @@ RUN echo "DATABASE_URL=postgres://postgres:NUizJbF1I6OhHDs@newsai-db.flycast:543
 # Set proper permissions for the cron file
 RUN chmod 0644 /etc/cron.d/news_ai_cron
 
-# Configure nginx for path-based routing
-RUN echo 'server {\n\
-    listen 8083;\n\
-    \n\
-    location / {\n\
-        proxy_pass http://127.0.0.1:8084;\n\
-        proxy_set_header Host $host;\n\
-        proxy_set_header X-Real-IP $remote_addr;\n\
-    }\n\
-    \n\
-    location /newsletter/ {\n\
-        proxy_pass http://127.0.0.1:8085;\n\
-        proxy_set_header Host $host;\n\
-        proxy_set_header X-Real-IP $remote_addr;\n\
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n\
-        proxy_set_header X-Forwarded-Proto $scheme;\n\
-    }\n\
-}' > /etc/nginx/conf.d/default.conf
+# Configure Nginx
+RUN rm /etc/nginx/sites-enabled/default
+COPY <<EOF /etc/nginx/sites-available/news_ai
+server {
+    listen 8085;
+    server_name _;
 
-# Create supervisor configuration
+    # Fix for "Contradictory scheme headers" issue
+    proxy_set_header X-Forwarded-Proto \$http_x_forwarded_proto;
+
+    # Management app routing
+    location /management {
+        proxy_pass http://127.0.0.1:3000/;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$http_x_forwarded_proto;
+        proxy_set_header X-Script-Name /management;
+    }
+
+    # Newsletter app routing - pass everything after /newsletter/
+    location ~ ^/newsletter(/.*|$) {
+        proxy_pass http://127.0.0.1:3001\$1;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$http_x_forwarded_proto;
+        proxy_set_header X-Script-Name /newsletter;
+    }
+    
+    # Health check route for the deployment
+    location = /health {
+        return 200 'OK';
+        add_header Content-Type text/plain;
+    }
+
+    # Root path redirect to management
+    location = / {
+        return 301 /management;
+    }
+
+    # Prevent accessing directly the nginx default error page
+    error_page 404 /404.html;
+    location = /404.html {
+        root /app/templates;
+        internal;
+    }
+}
+EOF
+
+RUN ln -s /etc/nginx/sites-available/news_ai /etc/nginx/sites-enabled/
+
+# Configure supervisor
 RUN echo '[supervisord]\n\
 nodaemon=true\n\
-\n\
-[program:cron]\n\
-command=cron -f\n\
-autostart=true\n\
-autorestart=true\n\
-stdout_logfile=/var/log/cron.log\n\
-stderr_logfile=/var/log/cron.err.log\n\
+user=root\n\
 \n\
 [program:nginx]\n\
 command=nginx -g "daemon off;"\n\
+priority=10\n\
 autostart=true\n\
 autorestart=true\n\
 stdout_logfile=/var/log/nginx.log\n\
 stderr_logfile=/var/log/nginx.err.log\n\
 \n\
-[program:subscriber_mgt]\n\
-command=gunicorn --bind 127.0.0.1:8084 subscriber_mgt:app\n\
-directory=/app\n\
+[program:cron]\n\
+command=cron -f\n\
+priority=20\n\
 autostart=true\n\
 autorestart=true\n\
+stdout_logfile=/var/log/cron.log\n\
+stderr_logfile=/var/log/cron.err.log\n\
+\n\
+[program:subscriber_mgt]\n\
+command=gunicorn --bind 127.0.0.1:3000 subscriber_mgt:app --timeout 120\n\
+directory=/app\n\
+priority=30\n\
+autostart=true\n\
+autorestart=true\n\
+startretries=3\n\
 stdout_logfile=/var/log/subscriber_mgt.log\n\
 stderr_logfile=/var/log/subscriber_mgt.err.log\n\
 \n\
 [program:newsletter_page]\n\
-command=gunicorn --bind 127.0.0.1:8085 Newsletter_page:app\n\
+command=gunicorn --bind 127.0.0.1:3001 Newsletter_page:app --timeout 120\n\
 directory=/app\n\
+priority=30\n\
 autostart=true\n\
 autorestart=true\n\
+startretries=3\n\
 stdout_logfile=/var/log/newsletter_page.log\n\
 stderr_logfile=/var/log/newsletter_page.err.log' > /etc/supervisor/conf.d/supervisord.conf
 
 # Expose the main port
-EXPOSE 8083
+EXPOSE 8085
 
 # The main process: run Supervisor in the foreground
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
