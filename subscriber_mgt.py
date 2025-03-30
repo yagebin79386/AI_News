@@ -129,6 +129,10 @@ class DatabaseManager:
 
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
+
+# Set the application root to "/" since this is the main app at domain root
+app.config['APPLICATION_ROOT'] = '/'
+
 db_url = os.environ.get("DATABASE_URL")
 if not db_url:
     raise ValueError("❌ DATABASE_URL environment variable not set.") 
@@ -807,9 +811,9 @@ def subscribe_management():
         )
 
 if __name__ == "__main__":
-
     try:
-        app.run(host="0.0.0.0", port=8083, debug=True)
+        # Use internal port 8084 to match the Nginx configuration
+        app.run(host="127.0.0.1", port=8084, debug=True)
     finally:
         # Close the persistent database connection when the server stops
         db_manager.conn.close()

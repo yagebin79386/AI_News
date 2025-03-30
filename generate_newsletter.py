@@ -59,6 +59,17 @@ class NewsletterGenerator:
             'web': os.path.join(self.script_dir, 'static', 'web.png')
         }
 
+        # Initialize base64 encoded images
+        self.base64_images = {}
+        for image_key, image_path in self.images.items():
+            try:
+                with open(image_path, 'rb') as image_file:
+                    encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
+                    self.base64_images[image_key] = encoded_string
+            except Exception as e:
+                print(f"[WARNING] Could not encode image {image_key}: {e}")
+                self.base64_images[image_key] = None
+
         # Initialize OpenAI
         print(f"[DEBUG] NewsletterGenerator initialized. Date range: {self.start_date} to {self.current_date}")
         print(f"[DEBUG] Script directory: {self.script_dir}")
@@ -70,6 +81,13 @@ class NewsletterGenerator:
         Returns the path if it exists, otherwise returns a default image path.
         """
         return self.images.get(image_key, os.path.join(self.script_dir, 'static', 'default.png'))
+
+    def get_image_data(self, image_key: str) -> str:
+        """
+        Get the base64 encoded image data for an image based on its key.
+        Returns the base64 string if it exists, otherwise returns None.
+        """
+        return self.base64_images.get(image_key)
 
     def fetch_top_articles(self):
         """
@@ -316,23 +334,23 @@ class NewsletterGenerator:
                 <tr>
                 <!-- Twitter Share Button -->
                 <td align="center" style="padding:5px;">
-                    <a href="https://twitter.com/intent/tweet?url=YOUR_URL&text=Check%20this%20out!" 
+                    <a href="https://twitter.com/intent/tweet?url=https://www.ainewsletter.homesmartify.lu/newsletter/{newsletter_id}&text=Check%20out%20this%20edition%20of%20Deeptech%20Digest!" 
                     target="_blank" style="text-decoration:none; color:#666666;">
-                    <img src="{self.get_image_path('twitter')}" alt="Twitter" style="width:20px; height:20px;">
+                    <img src="data:image/png;base64,{self.get_image_data('twitter')}" alt="Twitter" style="width:20px; height:20px;">
                     <span style="font-family:'Nunito', sans-serif; font-size:12px;">Twitter</span>
                     </a>
                 </td>
                 <!-- Copy Link Button -->
                 <td align="center" style="padding:5px;">
-                    <a href="YOUR_URL" target="_blank" style="text-decoration:none; color:#666666;">
-                    <img src="{self.get_image_path('link')}" alt="Copy Link" style="width:23px; height:23px;">
+                    <a href="https://www.ainewsletter.homesmartify.lu/newsletter/{newsletter_id}" target="_blank" style="text-decoration:none; color:#666666;">
+                    <img src="data:image/png;base64,{self.get_image_data('link')}" alt="Copy Link" style="width:23px; height:23px;">
                     <span style="font-family:'Nunito', sans-serif; font-size:12px;">Copy Link</span>
                     </a>
                 </td>
                 <!-- WhatsApp Share Button -->
                 <td align="center" style="padding:5px;">
-                    <a href="https://api.whatsapp.com/send?text=YOUR_URL" target="_blank" style="text-decoration:none; color:#666666;">
-                    <img src="{self.get_image_path('whatsapp')}" alt="WhatsApp" style="width:20px; height:20px;">
+                    <a href="https://api.whatsapp.com/send?text=Check%20out%20this%20edition%20of%20Deeptech%20Digest!%20https://www.ainewsletter.homesmartify.lu/newsletter/{newsletter_id}" target="_blank" style="text-decoration:none; color:#666666;">
+                    <img src="data:image/png;base64,{self.get_image_data('whatsapp')}" alt="WhatsApp" style="width:20px; height:20px;">
                     <span style="font-family:'Nunito', sans-serif; font-size:12px;">WhatsApp</span>
                     </a>
                 </td>
@@ -342,9 +360,8 @@ class NewsletterGenerator:
         </tr>
         <!-- Second row: Newsletter title -->
         <tr>
-            <td class="newsletter" colspan="2" align="center" 
-                style="font-family: 'Poppins', sans-serif; letter-spacing: 2px; font-size:38px; color:#0057e7; text-transform:uppercase; padding:20px 0;">
-            DEEPTECH DIGEST
+            <td colspan="2" align="center" style="font-family: 'Poppins', sans-serif; letter-spacing: 2px; font-size:38px; color:#0057e7; text-transform:uppercase; padding:20px 0;">
+                DEEPTECH DIGEST
             </td>
         </tr>
         </table>
@@ -356,9 +373,9 @@ class NewsletterGenerator:
         <h2 class="newsletter_title" style="
             display:block;
             font-family:'Poppins', sans-serif;
-            font-size:22px; 
-            color:#0057e7; 
-            margin:0 auto 20px auto; 
+            font-size:20px; 
+            color:#00cc00; 
+            margin:0 40 20px 40; 
             text-align:center; 
             max-width:600px;
         ">
@@ -384,7 +401,7 @@ class NewsletterGenerator:
             font-size:20px;
             font-family:'Poppins', sans-serif;
             color:#0057e7; 
-            margin:10px 35px 10px 35px; 
+            margin:10px 25px 10px 25px; 
             text-align:center;
         ">
             {title}
@@ -443,7 +460,14 @@ class NewsletterGenerator:
             )
         # Top News header
         top_news_header_html = """
-        <div class="top-news-header">
+        <div class="top-news-header" style="
+            text-align: center;
+            color: #00cc00;
+            font-family: 'Titan One', sans-serif;
+            font-size: 28px;
+            letter-spacing: 2px;
+            margin: 20px 0;
+        ">
             TOP NEWS!
         </div>
         """
@@ -526,7 +550,7 @@ class NewsletterGenerator:
         # Company logo
         company_logo_html = f"""
         <div class="logo-container">
-        <img src="{self.get_image_path('company_logo')}" alt="Company Logo" class="company-logo-img">
+        <img src="data:image/png;base64,{self.get_image_data('company_logo')}" alt="Company Logo" class="company-logo-img">
         </div>
         """
 
@@ -534,17 +558,17 @@ class NewsletterGenerator:
         contact_html = f"""
         <div class="contact-container">
         <div class="contact-item">
-            <img src="{self.get_image_path('phone')}" alt="Phone" class="contact-icon">
+            <img src="data:image/png;base64,{self.get_image_data('phone')}" alt="Phone" class="contact-icon">
             <span class="contact-text">{self.contact.get('contact_phone','')}</span>
             <span style="font-size:14px;">|</span>
         </div>
         <div class="contact-item">
-            <img src="{self.get_image_path('mail')}" alt="Email" class="contact-icon">
+            <img src="data:image/png;base64,{self.get_image_data('mail')}" alt="Email" class="contact-icon">
             <span class="contact-text">{self.contact.get('contact_mail','')}</span>
             <span style="font-size:14px;">|</span>
         </div>
         <div class="contact-item">
-            <img src="{self.get_image_path('web')}" alt="Website" class="contact-icon">
+            <img src="data:image/png;base64,{self.get_image_data('web')}" alt="Website" class="contact-icon">
             <span class="contact-text">{self.contact.get('contact_web','')}</span>
         </div>
         </div>
@@ -576,7 +600,7 @@ class NewsletterGenerator:
             :root {{
                 --bg-color: linear-gradient(135deg, #add8e6, #ffffe0);
                 --text-color: #333333;
-                --title-color: #007AFF;
+                --title-color: #0057e7;
                 --welcome-color: #34C759;
                 --link-color: #34AADC;
                 --box-bg: rgba(255,255,255,0.3);
@@ -593,6 +617,7 @@ class NewsletterGenerator:
                     --box-bg: rgba(255,255,255,0.1);
                     --footer-color: #a0a0a0;
                     --big-title-color: #2563EB;
+                    --top-news-color: #00cc00;
                 }}
                 body {{
                     background: var(--bg-color) !important;
@@ -602,7 +627,7 @@ class NewsletterGenerator:
                     color: var(--big-title-color) !important;
                 }}
                 .top-news-header {{
-                    color: var(--welcome-color) !important;
+                    color: var(--top-news-color) !important;
                 }}
                 .article-title {{
                     color: var(--title-color) !important;
@@ -640,6 +665,32 @@ class NewsletterGenerator:
                 font-family: Arial, sans-serif;
                 background: var(--bg-color);
                 color: var(--text-color);
+                min-height: 100vh;
+                width: 100%;
+            }}
+            .wrapper {{
+                width: 100%;
+                table-layout: fixed;
+                padding: 20px 0;
+                background: var(--bg-color);
+                box-sizing: border-box;
+            }}
+            .main {{
+                background: transparent;
+                margin: 0 auto;
+                width: 100%;
+                max-width: 600px;
+                border-spacing: 0;
+                border-collapse: collapse;
+            }}
+            .content-box {{
+                background: var(--box-bg);
+                border-radius: 12px;
+                padding: 20px;
+                margin: 20px auto;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                width: 100%;
+                box-sizing: border-box;
             }}
             .newsletter-title {{
                 font-family: 'Titan One', sans-serif;
@@ -654,44 +705,42 @@ class NewsletterGenerator:
                 color: var(--welcome-color);
                 text-align: center;
                 margin: 0 auto 20px auto;
+                padding: 0 20px;
+                width: 100%;
+                box-sizing: border-box;
             }}
             .intro-text {{
                 font-family: 'Nunito', sans-serif;
                 font-size: 16px;
                 color: var(--text-color);
-                margin: 0 40px 20px;
-                max-width: 700px;
+                margin: 0;
+                padding: 0 20px;
+                max-width: 100%;
                 text-align: left;
                 line-height: 1.6;
-            }}
-            .content-box {{
-                background: var(--box-bg);
-                border-radius: 12px;
-                padding: 20px;
-                margin: 20px auto 20px auto;
-                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                box-sizing: border-box;
             }}
             .article-title {{
                 font-family: 'Poppins', sans-serif;
                 font-size: 20px;
                 color: var(--title-color);
-                margin: 10px 35px;
+                margin: 10px 20px;
                 text-align: center;
             }}
             .article-summary {{
                 font-family: 'Nunito', sans-serif;
                 font-size: 14px;
                 color: var(--text-color);
-                margin-bottom: 20px;
+                margin: 0 10px 20px;
                 text-align: left;
             }}
             .top-news-header {{
                 text-align: center;
-                color: var(--title-color);
+                color: #0057e7;
                 font-family: 'Titan One', sans-serif;
                 font-size: 28px;
                 letter-spacing: 2px;
-                margin-bottom: 10px;
+                margin: 20px 0;
             }}
             button {{
                 padding: 6px 12px;
@@ -703,6 +752,8 @@ class NewsletterGenerator:
                 font-size: 12px;
                 font-family: 'Poppins', sans-serif;
                 transition: background-color 0.2s;
+                display: inline-block;
+                margin: 0 auto;
             }}
             button:hover {{
                 background: var(--title-color);
@@ -713,6 +764,7 @@ class NewsletterGenerator:
                 justify-content: center;
                 gap: 15px;
                 margin: 20px 0;
+                flex-wrap: wrap;
             }}
             .contact-item {{
                 display: flex;
@@ -733,126 +785,192 @@ class NewsletterGenerator:
                 font-style: italic;
                 color: var(--text-color);
                 margin: 25px 0;
+                padding: 0 20px;
             }}
             .footer-container {{
                 text-align: center;
                 font-size: 12px;
                 color: var(--footer-color);
-                margin-top: 20px;
+                margin: 20px 0;
                 line-height: 1.4;
+                padding: 20px;
+                background: transparent !important;
+                width: 100%;
+                box-sizing: border-box;
             }}
             @media only screen and (max-width: 600px) {{
+                .wrapper {{
+                    padding: 10px 15px;
+                    width: 100%;
+                    box-sizing: border-box;
+                }}
+                .main {{
+                    width: 100% !important;
+                    background: transparent !important;
+                    margin: 0 auto;
+                }}
+                .content-box {{
+                    margin: 10px 0;
+                    padding: 15px;
+                }}
                 .newsletter-title {{
                     font-size: 28px !important;
                 }}
                 .welcome-title {{
-                    font-size: 26px !important;
+                    font-size: 24px !important;
+                    padding: 0 15px !important;
                 }}
                 .intro-text {{
-                    font-size: 20px !important;
-                    margin: 0 20px 15px !important;
+                    font-size: 16px !important;
+                    padding: 0 15px !important;
                 }}
                 .article-title {{
-                    font-size: 32px !important;
+                    font-size: 20px !important;
+                    margin: 10px 15px;
                 }}
                 .article-summary {{
-                    font-size: 26px !important;
+                    font-size: 14px !important;
+                    margin: 0 10px 15px;
                 }}
                 .top-news-header {{
-                    font-size: 36px !important;
+                    font-size: 24px !important;
+                    margin: 15px 0;
                 }}
                 .contact-text {{
-                    font-size: 20px !important;
+                    font-size: 14px !important;
                 }}
                 .contact-icon {{
-                    width: 30px;
-                    height: 30px;
+                    width: 20px;
+                    height: 20px;
                 }}
                 .subscribe-container {{
-                    font-size: 20px !important;
+                    font-size: 14px !important;
+                    padding: 0 15px;
                 }}
                 .footer-container {{
-                    font-size: 18px !important;
+                    font-size: 12px !important;
+                    padding: 15px;
+                    margin: 15px 0;
+                    width: 100%;
+                    box-sizing: border-box;
+                    background: transparent !important;
                 }}
             }}
         </style>
         </head>
-        <body style="background:var(--bg-color); font-family:'Nunito', Arial, sans-serif;">
-        <table width="100%" cellspacing="0" cellpadding="0">
-            <tr>
-                <td align="center">
-                    <table width="600" cellpadding="0" cellspacing="0" style="border-spacing:0; border-collapse:collapse;">
-                        <tr>
-                            <td align="center" style="padding:20px;">
-                                <!-- HEADER AREA -->
-                                <table width="100%" style="background:var(--box-bg); border-radius:12px; padding:20px;">
-                                    <tr>
-                                        <td align="center" class="newsletter-title">
-                                            DEEPTECH DIGEST
-                                        </td>
-                                    </tr>
-                                </table>
+        <body>
+            <div class="wrapper">
+                <table class="main" align="center">
+                    <tr>
+                        <td>
+                            <!-- HEADER AREA -->
+                            <table width="100%" style="background:var(--box-bg); border-radius:12px; padding:20px;">
+                                <!-- Issue info and share buttons -->
+                                <tr class="issue-info-block">
+                                    <td align="left" style="font-family: 'Roboto Condensed', sans-serif; font-size: 13px; color: #666666; padding:0 0 20px 0;">
+                                        Issue No.{newsletter_id} Edition {edition_number}<br>
+                                        Current Date: {date_only_str}
+                                    </td>
+                                    <td align="right" style="vertical-align:top;">
+                                        <table border="0" cellspacing="0" cellpadding="0">
+                                            <tr>
+                                                <!-- Twitter Share Button -->
+                                                <td align="center" style="padding:5px;">
+                                                    <a href="https://twitter.com/intent/tweet?url=https://www.ainewsletter.homesmartify.lu/newsletter/{newsletter_id}&text=Check%20out%20this%20edition%20of%20Deeptech%20Digest!" 
+                                                    target="_blank" style="text-decoration:none; color:#666666;">
+                                                    <img src="data:image/png;base64,{self.get_image_data('twitter')}" alt="Twitter" style="width:20px; height:20px;">
+                                                    <span style="font-family:'Nunito', sans-serif; font-size:12px;">Twitter</span>
+                                                    </a>
+                                                </td>
+                                                <!-- Copy Link Button -->
+                                                <td align="center" style="padding:5px;">
+                                                    <a href="https://www.ainewsletter.homesmartify.lu/newsletter/{newsletter_id}" target="_blank" style="text-decoration:none; color:#666666;">
+                                                    <img src="data:image/png;base64,{self.get_image_data('link')}" alt="Copy Link" style="width:23px; height:23px;">
+                                                    <span style="font-family:'Nunito', sans-serif; font-size:12px;">Copy Link</span>
+                                                    </a>
+                                                </td>
+                                                <!-- WhatsApp Share Button -->
+                                                <td align="center" style="padding:5px;">
+                                                    <a href="https://api.whatsapp.com/send?text=Check%20out%20this%20edition%20of%20Deeptech%20Digest!%20https://www.ainewsletter.homesmartify.lu/newsletter/{newsletter_id}" target="_blank" style="text-decoration:none; color:#666666;">
+                                                    <img src="data:image/png;base64,{self.get_image_data('whatsapp')}" alt="WhatsApp" style="width:20px; height:20px;">
+                                                    <span style="font-family:'Nunito', sans-serif; font-size:12px;">WhatsApp</span>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <!-- Newsletter title -->
+                                <tr>
+                                    <td colspan="2" align="center" style="font-family: 'Poppins', sans-serif; letter-spacing: 2px; font-size:38px; color:#0057e7; text-transform:uppercase; padding:20px 0;">
+                                        DEEPTECH DIGEST
+                                    </td>
+                                </tr>
+                            </table>
 
-                                <!-- MAIN CONTENT -->
-                                <div class="content-box">
-                                    <h2 class="welcome-title">{newsletter_title}</h2>
-                                    <p class="intro-text">{introduction}</p>
-                                    
-                                    <!-- Articles -->
-                                    {article_blocks}
-                                    
-                                    <!-- Top News -->
-                                    <div class="top-news-header">TOP NEWS!</div>
-                                    {top_news_html}
-                                    
-                                    <!-- Redirect -->
-                                    <div style="text-align:center; margin-top:20px;">
-                                        <p class="intro-text">
-                                            Feel free to visit our website for more news and smart technologies possibilities!
-                                        </p>
-                                        <a href="{self.redirect_link}" target="_blank" style="text-decoration:none;">
-                                            <button>Explore More</button>
-                                        </a>
-                                    </div>
-                                </div>
-
-                                <!-- COMPANY LOGO -->
-                                <div style="text-align:center !important; margin-bottom:10px;">
-                                    <img src="{self.get_image_path('company_logo')}" alt="Company Logo" style="display:block; width:140px !important; height:auto; margin:0 auto;">
-                                </div>
-
-                                <!-- CONTACT AREA -->
+                            <!-- MAIN CONTENT -->
+                            <div class="content-box">
+                                <h2 class="welcome-title">{newsletter_title}</h2>
+                                <p class="intro-text">{introduction}</p>
+                                
+                                <!-- Articles -->
+                                {article_blocks}
+                                
+                                <!-- Top News -->
+                                <div style="
+                                    text-align: center;
+                                    color: #00cc00;
+                                    font-family: 'Titan One', sans-serif;
+                                    font-size: 28px;
+                                    letter-spacing: 2px;
+                                    margin: 20px 0;
+                                ">TOP NEWS!</div>
+                                {top_news_html}
+                                
+                                <!-- Redirect -->
                                 <div style="text-align:center; margin-top:20px;">
-                                    <div class="contact-container">
-                                        <div class="contact-item">
-                                            <img src="{self.get_image_path('phone')}" alt="Phone" class="contact-icon">
-                                            <span class="contact-text">{self.contact.get('contact_phone','')}</span>
-                                            <span style="font-size:14px; color:var(--text-color);">|</span>
-                                        </div>
-                                        <div class="contact-item">
-                                            <img src="{self.get_image_path('mail')}" alt="Email" class="contact-icon">
-                                            <span class="contact-text">{self.contact.get('contact_mail','')}</span>
-                                            <span style="font-size:14px; color:var(--text-color);">|</span>
-                                        </div>
-                                        <div class="contact-item">
-                                            <img src="{self.get_image_path('web')}" alt="Website" class="contact-icon">
-                                            <span class="contact-text">{self.contact.get('contact_web','')}</span>
-                                        </div>
-                                    </div>
-
-                                    <!-- FOOTER -->
-                                    <div class="footer-container">
-                                        &copy; 2025 HomeSmartify.lu<br>
-                                        Transforming Technology: Where Smart Technology Meets Caring Comfort.<br>
-                                        Luxembourg City, Luxembourg 1329
-                                    </div>
+                                    <p class="intro-text">
+                                        Feel free to visit our website for more news and smart technologies possibilities!
+                                    </p>
+                                    <a href="{self.redirect_link}" target="_blank" style="text-decoration:none;">
+                                        <button>Explore More</button>
+                                    </a>
                                 </div>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
+                            </div>
+
+                            <!-- COMPANY LOGO -->
+                            <div style="text-align:center; margin:20px 0;">
+                                <img src="data:image/png;base64,{self.get_image_data('company_logo')}" alt="Company Logo" style="width:140px; height:auto; margin:0 auto;">
+                            </div>
+
+                            <!-- CONTACT AREA -->
+                            <div class="contact-container">
+                                <div class="contact-item">
+                                    <img src="data:image/png;base64,{self.get_image_data('phone')}" alt="Phone" class="contact-icon">
+                                    <span class="contact-text">{self.contact.get('contact_phone','')}</span>
+                                    <span style="font-size:14px; color:var(--text-color);">|</span>
+                                </div>
+                                <div class="contact-item">
+                                    <img src="data:image/png;base64,{self.get_image_data('mail')}" alt="Email" class="contact-icon">
+                                    <span class="contact-text">{self.contact.get('contact_mail','')}</span>
+                                    <span style="font-size:14px; color:var(--text-color);">|</span>
+                                </div>
+                                <div class="contact-item">
+                                    <img src="data:image/png;base64,{self.get_image_data('web')}" alt="Website" class="contact-icon">
+                                    <span class="contact-text">{self.contact.get('contact_web','')}</span>
+                                </div>
+                            </div>
+
+                            <!-- FOOTER -->
+                            <div class="footer-container">
+                                &copy; 2025 HomeSmartify.lu<br>
+                                Transforming Technology: Where Smart Technology Meets Caring Comfort.<br>
+                                Luxembourg City, Luxembourg 1329
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
         </body>
         </html>
         """

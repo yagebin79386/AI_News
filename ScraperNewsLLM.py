@@ -431,7 +431,7 @@ class NewsScrapperGeneral:
 
 if __name__ == "__main__":
     load_dotenv()
-    base_url = ["https://futureoflife.org", "https://www.technologyreview.com", "https://www.wired.com/tag/artificial-intelligence/", "https://www.deeplearning.ai/the-batch/", "https://distill.pub", "https://montrealethics.ai", "https://venturebeat.com/category/ai/"]
+    base_url = ["https://futureoflife.org", "https://www.technologyreview.com", "https://www.wired.com/tag/artificial-intelligence/", "https://www.deeplearning.ai/the-batch/", "https://montrealethics.ai", "https://venturebeat.com/category/ai/", "https://www.artificialintelligence-news.com", "https://www.reuters.com/technology/artificial-intelligence/"]
     db_url = os.environ.get("DATABASE_URL")
     if not db_url:
         raise ValueError("❌ DATABASE_URL environment variable not set.") 

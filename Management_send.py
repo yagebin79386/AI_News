@@ -1,17 +1,22 @@
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from email.mime.image import MIMEImage
-import psycopg2
-import psycopg2.extras
-from urllib.parse import quote
-from urllib.parse import urlparse
+import base64
 import os
 from dotenv import load_dotenv
 
 # Get the directory where the script is located
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(SCRIPT_DIR, 'static')
+
+def get_base64_image(image_path):
+    """Convert image to base64 string."""
+    try:
+        with open(image_path, 'rb') as image_file:
+            return base64.b64encode(image_file.read()).decode('utf-8')
+    except Exception as e:
+        print(f"[ERROR] Unable to encode image {image_path}: {e}")
+        return None
 
 def send_subs_management_email_to_user(recipient_email):
     """
@@ -32,22 +37,25 @@ def send_subs_management_email_to_user(recipient_email):
     # Build subscription management link
     manage_link = f"https://www.ainewsletter.homesmartify.lu/?email={recipient_email}"
 
+    # Convert images to base64
+    images = {
+        'company_logo': get_base64_image(os.path.join(STATIC_DIR, 'company_logo.png')),
+        'phone_icon': get_base64_image(os.path.join(STATIC_DIR, 'phone.png')),
+        'email_icon': get_base64_image(os.path.join(STATIC_DIR, 'mail.png')),
+        'web_icon': get_base64_image(os.path.join(STATIC_DIR, 'web.png'))
+    }
 
-    msg_root = MIMEMultipart('related')
-    msg_root['Subject'] = subject
-    msg_root['From'] = sender
-    msg_root['To'] = recipient_email
-    
+    # Create message container
+    msg = MIMEMultipart('alternative')
+    msg['Subject'] = subject
+    msg['From'] = sender
+    msg['To'] = recipient_email
 
-    # Create a nested 'alternative' part for plain text and HTML.
-    msg_alternative = MIMEMultipart('alternative')
-    msg_root.attach(msg_alternative)
-
-    # Plain text fallback.
+    # Plain text fallback
     text_part = MIMEText("Manage your DeepTech Digest Newsletter", 'plain')
-    msg_alternative.attach(text_part)
+    msg.attach(text_part)
 
-    # Final HTML email (all surplus parts removed and newsletter title fixed)
+    # Final HTML email with base64-embedded images
     welcome_html = f"""
     <!DOCTYPE html>
     <html lang="en">
@@ -171,27 +179,28 @@ def send_subs_management_email_to_user(recipient_email):
 
                   <!-- COMPANY LOGO -->
                   <div style="text-align:center !important; margin-bottom:10px;">
-                    <img src="cid:company_logo" alt="Company Logo" style="display:block; width:140px !important; height:auto; margin:0 auto;">
+                    <img src="data:image/png;base64,{images['company_logo']}" alt="Company Logo" style="display:block; width:140px !important; height:auto; margin:0 auto;">
                   </div>  
                   
                   <!-- CONTACT AREA -->
                   <div style="text-align:center; margin-top:20px;">
                     <div style="display:flex; justify-content:center; gap:15px;">
-                      <img src="cid:phone_icon" alt="Phone" style="width:20px; height:20px;">
+                      <img src="data:image/png;base64,{images['phone_icon']}" alt="Phone" style="width:20px; height:20px;">
                       <span style="font-size:14px; color:var(--text-color);">{contact['contact_phone']}</span>
                       <span style="font-size:14px; color:var(--text-color);">|</span>
-                      <img src="cid:email_icon" alt="Email" style="width:20px; height:20px;">
+                      <img src="data:image/png;base64,{images['email_icon']}" alt="Email" style="width:20px; height:20px;">
                       <span style="font-size:14px; color:var(--text-color);">{contact.get('contact_mail','')}</span>
                       <span style="font-size:14px; color:var(--text-color);">|</span>
-                      <img src="cid:web_icon" alt="Website" style="width:20px; height:20px;">
+                      <img src="data:image/png;base64,{images['web_icon']}" alt="Website" style="width:20px; height:20px;">
                       <span style="font-size:14px; color:var(--text-color);">{contact.get('contact_web','')}</span>
                     </div>
-                    <!-- FOOTER AREA -->
-                    <div class="company-footer" style="text-align:center; font-size:12px; color:var(--footer-color); margin-top:15px;">
-                      &copy; 2025 HomeSmartify.lu<br>
-                      Transforming Technology: Where Smart Technology Meets Caring Comfort.<br>
-                      Luxembourg City, Luxembourg 1329
-                    </div>
+                  </div>
+
+                  <!-- FOOTER AREA -->
+                  <div style="text-align:center; font-size:12px; color:var(--footer-color); margin-top:15px; background:transparent;">
+                    &copy; 2025 HomeSmartify.lu<br>
+                    Transforming Technology: Where Smart Technology Meets Caring Comfort.<br>
+                    Luxembourg City, Luxembourg 1329
                   </div>
                 </td>
               </tr>
@@ -202,36 +211,13 @@ def send_subs_management_email_to_user(recipient_email):
     </body>
     </html>
     """
-    msg_alternative.attach(MIMEText(welcome_html, "html"))
-
-    # Load icon from the static folder
-    # Define the images to attach with their corresponding CIDs.
-    images = {
-        'company_logo': os.path.join(STATIC_DIR, 'company_logo.png'),
-        'phone_icon': os.path.join(STATIC_DIR, 'phone.png'),
-        'email_icon': os.path.join(STATIC_DIR, 'mail.png'),
-        'web_icon': os.path.join(STATIC_DIR, 'web.png')
-    }
-
-
-
-      # Attach each image as MIMEImage with the correct Content-ID
-    for cid, image_path in images.items():
-        try:
-            with open(image_path, 'rb') as f:
-                img_data = f.read()
-            mime_img = MIMEImage(img_data)
-            mime_img.add_header('Content-ID', f'<{cid}>')
-            mime_img.add_header('Content-Disposition', 'inline', filename=image_path)
-            msg_root.attach(mime_img)
-        except Exception as e:
-            print(f"[ERROR] Unable to attach {image_path}: {e}")
+    msg.attach(MIMEText(welcome_html, "html"))
 
     # Send the email
     with smtplib.SMTP("smtp.openxchange.eu", 587) as server:
         server.starttls()
         server.login(sender, sender_password)
-        server.sendmail(sender, recipient_email, msg_root.as_string())
+        server.sendmail(sender, recipient_email, msg.as_string())
 
     print(f"[DEBUG] Sent welcome email to {recipient_email}")
 
