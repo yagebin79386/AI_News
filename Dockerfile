@@ -5,11 +5,10 @@ FROM python:3.10-slim
 ENV TZ=Europe/London
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# Install cron & supervisor so we can run multiple processes
+# Install supervisor and other dependencies
 RUN apt-get update && apt-get install -y \
     gnupg2 \
     wget \
-    cron \
     supervisor \
     libpq-dev \
     gcc \
@@ -57,16 +56,17 @@ RUN mkdir -p /var/log/news_AI && \
 # Copy all project files into the container
 COPY . .
 
-# Create crontab file with proper line endings
-RUN echo "DATABASE_URL=postgres://postgres:NUizJbF1I6OhHDs@newsai-db.flycast:5432" > /etc/cron.d/news_ai_cron && \
-    echo "0 17 * * 1,3,5 root /usr/local/bin/python3 /app/ScraperNewsLLM.py >> /var/log/news_AI_scrape_app.log 2>&1" >> /etc/cron.d/news_ai_cron && \
-    echo "30 18 * * 1,3,5 root /usr/local/bin/python3 /app/categorizationLLM.py >> /var/log/news_AI_categorization_app.log 2>&1" >> /etc/cron.d/news_ai_cron && \
-    echo "20 19 * * 1,3,5 root /usr/local/bin/python3 /app/evaluate_articles.py >> /var/log/news_AI_evaluation_app.log 2>&1" >> /etc/cron.d/news_ai_cron && \
-    echo "30 19 * * 1,3,5 root /usr/local/bin/python3 /app/generate_newsletter.py >> /var/log/news_AI_generate_app.log 2>&1" >> /etc/cron.d/news_ai_cron && \
-    echo "0 20 * * 1,3,5 root /usr/local/bin/python3 /app/Newsletter_send.py >> /var/log/news_AI_send_app.log 2>&1" >> /etc/cron.d/news_ai_cron
+# Install supercronic
+ADD https://github.com/aptible/supercronic/releases/latest/download/supercronic-linux-amd64 /usr/local/bin/supercronic
+RUN chmod +x /usr/local/bin/supercronic
 
-# Set proper permissions for the cron file
-RUN chmod 0644 /etc/cron.d/news_ai_cron
+# Create the crontab file for supercronic
+RUN echo "# News AI cron jobs with environment variables available from container" > /app/news-ai-crontab && \
+    echo "0 17 * * 1,3,5 /usr/local/bin/python3 /app/ScraperNewsLLM.py >> /var/log/news_AI_scrape_app.log 2>&1" >> /app/news-ai-crontab && \
+    echo "30 18 * * 1,3,5 /usr/local/bin/python3 /app/categorizationLLM.py >> /var/log/news_AI_categorization_app.log 2>&1" >> /app/news-ai-crontab && \
+    echo "20 19 * * 1,3,5 /usr/local/bin/python3 /app/evaluate_articles.py >> /var/log/news_AI_evaluation_app.log 2>&1" >> /app/news-ai-crontab && \
+    echo "30 19 * * 1,3,5 /usr/local/bin/python3 /app/generate_newsletter.py >> /var/log/news_AI_generate_app.log 2>&1" >> /app/news-ai-crontab && \
+    echo "0 20 * * 1,3,5 /usr/local/bin/python3 /app/Newsletter_send.py >> /var/log/news_AI_send_app.log 2>&1" >> /app/news-ai-crontab
 
 # Configure Nginx
 RUN rm /etc/nginx/sites-enabled/default
@@ -133,13 +133,13 @@ autorestart=true\n\
 stdout_logfile=/var/log/nginx.log\n\
 stderr_logfile=/var/log/nginx.err.log\n\
 \n\
-[program:cron]\n\
-command=cron -f\n\
+[program:supercronic]\n\
+command=/usr/local/bin/supercronic /app/news-ai-crontab\n\
 priority=20\n\
 autostart=true\n\
 autorestart=true\n\
-stdout_logfile=/var/log/cron.log\n\
-stderr_logfile=/var/log/cron.err.log\n\
+stdout_logfile=/var/log/supercronic.log\n\
+stderr_logfile=/var/log/supercronic.err.log\n\
 \n\
 [program:subscriber_mgt]\n\
 command=gunicorn --bind 127.0.0.1:3000 subscriber_mgt:app --timeout 120\n\
@@ -161,8 +161,12 @@ startretries=3\n\
 stdout_logfile=/var/log/newsletter_page.log\n\
 stderr_logfile=/var/log/newsletter_page.err.log' > /etc/supervisor/conf.d/supervisord.conf
 
+# Make sure start.sh is executable
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+
 # Expose the main port
 EXPOSE 8085
 
-# The main process: run Supervisor in the foreground
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+# Use start.sh as the container entry point
+CMD ["/app/start.sh"]

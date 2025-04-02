@@ -16,9 +16,37 @@ import psycopg2.extras
 from newspaper import Article, Config # Requires: pip install newspaper3k
 from dateutil import parser
 from urllib.parse import urlparse
-import os
+import sys
 from dotenv import load_dotenv
 
+# Print startup information for debugging
+print(f"Script started at: {datetime.now().isoformat()}")
+print(f"Current working directory: {os.getcwd()}")
+print(f"Python version: {sys.version}")
+
+# Load environment variables from .env file if it exists
+# This helps with local development and ensures variables are loaded
+# even when running via cron/supercronic
+try:
+    print("Attempting to load environment variables from .env file")
+    load_dotenv()
+    print("Environment loaded from .env file")
+except Exception as e:
+    print(f"Note: Failed to load .env file - this is expected in production: {e}")
+
+# Check critical environment variables and print status (without exposing secrets)
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+if not OPENAI_API_KEY:
+    print("⚠️ Warning: OPENAI_API_KEY environment variable is not set")
+else:
+    print("✅ OPENAI_API_KEY is set")
+
+if not DATABASE_URL:
+    print("⚠️ Warning: DATABASE_URL environment variable is not set")
+else:
+    print(f"✅ DATABASE_URL is set, connecting to: {urlparse(DATABASE_URL).hostname}")
 
 class NewsScrapperGeneral:
     def __init__(self, base_urls, db_config):
@@ -53,7 +81,6 @@ class NewsScrapperGeneral:
         Stops after finding 10 additional pages per base URL (total 11 pages).
         """
         options = uc.ChromeOptions()
-        options.headless = True
         options.add_argument("--headless=new")
         options.add_argument("--disable-blink-features=AutomationControlled")
         options.add_argument("--no-sandbox")
@@ -162,7 +189,6 @@ class NewsScrapperGeneral:
                 # Fall back to Selenium if requests fails
                 try:
                     options = uc.ChromeOptions()
-                    options.headless = True
                     options.add_argument("--headless=new")
                     options.add_argument("--disable-blink-features=AutomationControlled")
                     options.add_argument("--no-sandbox")
@@ -178,7 +204,47 @@ class NewsScrapperGeneral:
                     options.add_argument("--ignore-certificate-errors")
                     options.add_argument("--homedir=/tmp")
 
-                    driver = uc.Chrome(options=options)
+                    try:
+                        # Use undetected-chromedriver with version_main parameter to automatically match Chrome version
+                        driver = uc.Chrome(options=options, use_subprocess=True)
+                    except Exception as chrome_error:
+                        print(f"⚠️ Error with default Chrome setup: {chrome_error}")
+                        print("Trying with explicit version handling...")
+                        try:
+                            # Get the installed Chrome version using selenium-stealth
+                            import subprocess
+                            version_output = ""
+                            try:
+                                if os.name == 'nt':  # Windows
+                                    process = subprocess.Popen(
+                                        'reg query "HKEY_CURRENT_USER\\Software\\Google\\Chrome\\BLBeacon" /v version',
+                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
+                                    )
+                                    output, error = process.communicate()
+                                    version_output = output.decode('utf-8')
+                                    chrome_version = re.search(r'version\s+REG_SZ\s+([\d.]+)', version_output).group(1)
+                                else:  # Linux/Mac
+                                    process = subprocess.Popen(
+                                        'google-chrome --version',
+                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
+                                    )
+                                    output, error = process.communicate()
+                                    version_output = output.decode('utf-8')
+                                    chrome_version = re.search(r'Chrome\s+([\d.]+)', version_output).group(1)
+                                
+                                main_version = int(chrome_version.split('.')[0])
+                                print(f"Detected Chrome version: {chrome_version} (Main: {main_version})")
+                                driver = uc.Chrome(options=options, version_main=main_version, use_subprocess=True)
+                            except Exception as version_error:
+                                print(f"⚠️ Error detecting Chrome version: {version_error}")
+                                print(f"Version output: {version_output}")
+                                # If we still can't detect, try with a hardcoded recent version
+                                driver = uc.Chrome(options=options, version_main=114, use_subprocess=True)
+                        except Exception as detailed_error:
+                            print(f"❌ Failed to create Chrome driver with explicit version: {detailed_error}")
+                            # Skip this URL and continue with the next one
+                            continue
+                            
                     try:
                         driver.get(single_url)
                         raw_html = driver.page_source
@@ -195,6 +261,14 @@ class NewsScrapperGeneral:
         For each cleaned HTML (keyed by URL in the 'html' dict),
         The extracted markdown is accumulated per URL and stored in the 'extracted_news' dict.
         """
+        # Check if OpenAI API key is available before trying to use it
+        if not OPENAI_API_KEY:
+            print("❌ Error: Cannot extract news articles. OPENAI_API_KEY not set in environment variables.")
+            for page in self.webpages:
+                for url_key in page["html"].keys():
+                    page["extracted_news"][url_key] = ""
+            return
+
         for page in self.webpages:
             for url_key, html_content in page["html"].items():
                 if not isinstance(html_content, str):
@@ -218,7 +292,7 @@ class NewsScrapperGeneral:
                 ```
                 """
                 try:
-                    client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+                    client = openai.OpenAI(api_key=OPENAI_API_KEY)
                     response = client.chat.completions.create(
                         model="gpt-4o",
                         messages=[{"role": "system", "content": prompt}],
@@ -402,8 +476,9 @@ class NewsScrapperGeneral:
         Attempts to parse date_str and returns a string formatted as "%Y-%m-%d".
         If parsing fails, returns None.
         """
-        if not date_str:
+        if not date_str or date_str.lower() == 'null' or date_str.strip() == '':
             return None
+            
         try:
             dt = parser.parse(date_str)
             return dt.strftime("%Y-%m-%d")
@@ -412,11 +487,19 @@ class NewsScrapperGeneral:
 
 
 if __name__ == "__main__":
-    load_dotenv()
+    # Load environment variables already done at the top of the file
+    
+    # Check for required environment variables
+    if not os.environ.get("OPENAI_API_KEY"):
+        print("❌ OPENAI_API_KEY environment variable not set. News extraction will fail.")
+    
     base_url = ["https://futureoflife.org", "https://www.technologyreview.com", "https://www.wired.com/tag/artificial-intelligence/", "https://www.deeplearning.ai/the-batch/", "https://montrealethics.ai", "https://venturebeat.com/category/ai/", "https://www.artificialintelligence-news.com", "https://www.reuters.com/technology/artificial-intelligence/"]
     db_url = os.environ.get("DATABASE_URL")
     if not db_url:
-        raise ValueError("❌ DATABASE_URL environment variable not set.") 
+        print("❌ DATABASE_URL environment variable not set.")
+        print("Please set DATABASE_URL in your .env file or container environment.")
+        sys.exit(1)
+    
     parsed_url = urlparse(db_url)
     db_config = {
         "dbname": parsed_url.path[1:],  # skip leading slash
@@ -424,13 +507,26 @@ if __name__ == "__main__":
         "password": parsed_url.password,
         "host": parsed_url.hostname,
     }
-    scrapper = NewsScrapperGeneral(base_url, db_config)
-#    scrapper.find_all_pagination_urls()
-    scrapper.get_and_clean_html()
-    scrapper.extract_news_articles_with_chatgpt()
-    scrapper.flatten_news()
-    scrapper.save_to_db()
-    scrapper.update_article_details()  # Uncommenting this to update article details
-    scrapper.normalize_and_update_publication_dates()
-    scrapper.conn.close()
+    
+    try:
+        print(f"Connecting to database: {db_config['host']}/{db_config['dbname']} as {db_config['user']}")
+        scrapper = NewsScrapperGeneral(base_url, db_config)
+        
+        # Uncomment or comment out steps as needed
+        # scrapper.find_all_pagination_urls()
+        scrapper.get_and_clean_html()
+        scrapper.extract_news_articles_with_chatgpt()
+        scrapper.flatten_news()
+        scrapper.save_to_db()
+        scrapper.update_article_details()  # Update article details
+        scrapper.normalize_and_update_publication_dates()
+        
+        # Close database connection
+        scrapper.conn.close()
+        print("✅ Script completed successfully at:", datetime.now().isoformat())
+    except Exception as e:
+        print(f"❌ An error occurred: {e}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
 
