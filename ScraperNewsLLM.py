@@ -231,25 +231,7 @@ class NewsScrapperGeneral:
                 except Exception as e:
                     print(f"❌ Error with OpenAI API for {url_key}: {e}")
                     page["extracted_news"][url_key] = ""
-#                    extracted_text = ""
-#                    if response.status_code == 200:
-#                        for line in response.iter_lines():
-#                            if line:
-#                                try:
-#                                    json_line = json.loads(line.decode("utf-8").replace("data: ", ""))
-#                                    if "choices" in json_line and json_line["choices"]:
-#                                        extracted_text += json_line["choices"][0]["delta"].get("content", "")
-#                                except json.JSONDecodeError:
-#                                    continue
-#                        print(f"Extracted text for {url_key}:\n{extracted_text}\n")
-#                    else:
 
-#                        print(f"API error for {url_key}: {response.status_code}, {response.text}")
-#                except Exception as e:
-#                    print(f"Error processing content with ChatGPT for {url_key}: {e}")
-#                page["extracted_news"][url_key] = extracted_text.strip()
-
-    
     def flatten_news(self):
         def convert_markdown_to_articles(markdown_text):
             blocks = re.split(r"\n(?=\d+\.)", markdown_text.strip())
