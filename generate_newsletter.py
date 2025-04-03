@@ -731,7 +731,7 @@ class NewsletterGenerator:
                 font-family: 'Nunito', sans-serif;
                 font-size: 14px;
                 color: var(--text-color);
-                margin: 0 10px 20px;
+                margin: 0 5px 20px;
                 text-align: left;
             }}
             .top-news-header {{
@@ -830,11 +830,15 @@ class NewsletterGenerator:
                 }}
                 .article-summary {{
                     font-size: 14px !important;
-                    margin: 0 10px 15px;
+                    margin: 0 5px 15px;
                 }}
                 .top-news-header {{
                     font-size: 24px !important;
                     margin: 15px 0;
+                }}
+                .top-news-text {{
+                    font-size: 14px !important;
+                    margin: 0 5px 15px;
                 }}
                 .contact-text {{
                     font-size: 14px !important;

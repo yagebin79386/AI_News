@@ -5,11 +5,10 @@ FROM python:3.10-slim
 ENV TZ=Europe/London
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# Install supervisor and other dependencies
+# Install dependencies (removed supervisor)
 RUN apt-get update && apt-get install -y \
     gnupg2 \
     wget \
-    supervisor \
     libpq-dev \
     gcc \
     libnss3 \
@@ -51,22 +50,33 @@ RUN mkdir -p /var/log/news_AI && \
     touch /var/log/news_AI_categorization_app.log && chmod 644 /var/log/news_AI_categorization_app.log && \
     touch /var/log/news_AI_evaluation_app.log && chmod 644 /var/log/news_AI_evaluation_app.log && \
     touch /var/log/news_AI_generate_app.log && chmod 644 /var/log/news_AI_generate_app.log && \
-    touch /var/log/news_AI_send_app.log && chmod 644 /var/log/news_AI_send_app.log
+    touch /var/log/news_AI_send_app.log && chmod 644 /var/log/news_AI_send_app.log && \
+    touch /var/log/supercronic.log && chmod 644 /var/log/supercronic.log && \
+    touch /var/log/nginx.log && chmod 644 /var/log/nginx.log && \
+    touch /var/log/nginx.err.log && chmod 644 /var/log/nginx.err.log && \
+    touch /var/log/subscriber_mgt.log && chmod 644 /var/log/subscriber_mgt.log && \
+    touch /var/log/subscriber_mgt.err.log && chmod 644 /var/log/subscriber_mgt.err.log && \
+    touch /var/log/newsletter_page.log && chmod 644 /var/log/newsletter_page.log && \
+    touch /var/log/newsletter_page.err.log && chmod 644 /var/log/newsletter_page.err.log
 
 # Copy all project files into the container
 COPY . .
+
+# Make all Python scripts executable
+RUN find /app -name "*.py" -exec chmod +x {} \;
 
 # Install supercronic
 ADD https://github.com/aptible/supercronic/releases/latest/download/supercronic-linux-amd64 /usr/local/bin/supercronic
 RUN chmod +x /usr/local/bin/supercronic
 
 # Create the crontab file for supercronic
-RUN echo "# News AI cron jobs with environment variables available from container" > /app/news-ai-crontab && \
-    echo "0 17 * * 1,3,5 /usr/local/bin/python3 /app/ScraperNewsLLM.py >> /var/log/news_AI_scrape_app.log 2>&1" >> /app/news-ai-crontab && \
-    echo "30 18 * * 1,3,5 /usr/local/bin/python3 /app/categorizationLLM.py >> /var/log/news_AI_categorization_app.log 2>&1" >> /app/news-ai-crontab && \
-    echo "20 19 * * 1,3,5 /usr/local/bin/python3 /app/evaluate_articles.py >> /var/log/news_AI_evaluation_app.log 2>&1" >> /app/news-ai-crontab && \
-    echo "30 19 * * 1,3,5 /usr/local/bin/python3 /app/generate_newsletter.py >> /var/log/news_AI_generate_app.log 2>&1" >> /app/news-ai-crontab && \
-    echo "0 20 * * 1,3,5 /usr/local/bin/python3 /app/Newsletter_send.py >> /var/log/news_AI_send_app.log 2>&1" >> /app/news-ai-crontab
+COPY my-crontab /app/my-crontab
+RUN chmod 0644 /app/my-crontab
+
+# Test supercronic setup during build
+RUN echo "* * * * * echo test" > /tmp/test-crontab && \
+    /usr/local/bin/supercronic -test /tmp/test-crontab && \
+    echo "Supercronic validation successful"
 
 # Configure Nginx
 RUN rm /etc/nginx/sites-enabled/default
@@ -119,47 +129,6 @@ server {
 EOF
 
 RUN ln -s /etc/nginx/sites-available/news_ai /etc/nginx/sites-enabled/
-
-# Configure supervisor
-RUN echo '[supervisord]\n\
-nodaemon=true\n\
-user=root\n\
-\n\
-[program:nginx]\n\
-command=nginx -g "daemon off;"\n\
-priority=10\n\
-autostart=true\n\
-autorestart=true\n\
-stdout_logfile=/var/log/nginx.log\n\
-stderr_logfile=/var/log/nginx.err.log\n\
-\n\
-[program:supercronic]\n\
-command=/usr/local/bin/supercronic /app/news-ai-crontab\n\
-priority=20\n\
-autostart=true\n\
-autorestart=true\n\
-stdout_logfile=/var/log/supercronic.log\n\
-stderr_logfile=/var/log/supercronic.err.log\n\
-\n\
-[program:subscriber_mgt]\n\
-command=gunicorn --bind 127.0.0.1:3000 subscriber_mgt:app --timeout 120\n\
-directory=/app\n\
-priority=30\n\
-autostart=true\n\
-autorestart=true\n\
-startretries=3\n\
-stdout_logfile=/var/log/subscriber_mgt.log\n\
-stderr_logfile=/var/log/subscriber_mgt.err.log\n\
-\n\
-[program:newsletter_page]\n\
-command=gunicorn --bind 127.0.0.1:3001 Newsletter_page:app --timeout 120\n\
-directory=/app\n\
-priority=30\n\
-autostart=true\n\
-autorestart=true\n\
-startretries=3\n\
-stdout_logfile=/var/log/newsletter_page.log\n\
-stderr_logfile=/var/log/newsletter_page.err.log' > /etc/supervisor/conf.d/supervisord.conf
 
 # Make sure start.sh is executable
 COPY start.sh /app/start.sh
