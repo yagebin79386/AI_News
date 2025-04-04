@@ -25,13 +25,12 @@ export SUPERCRONIC_DEBUG=1
 SUPERCRONIC_PID=$!
 echo "Supercronic started with PID: $SUPERCRONIC_PID"
 
-# Start the subscriber management app with gunicorn
-echo "Starting subscriber management app..."
-cd /app && gunicorn --bind 127.0.0.1:3000 subscriber_mgt:app --timeout 120 > /var/log/subscriber_mgt.log 2> /var/log/subscriber_mgt.err.log &
+# Start the specific application services
+echo "Starting application-specific services..."
+bash /app/news_ai/start.sh &
+sleep 5
+bash /app/news_crypto/start.sh &
 
-# Start the newsletter page app with gunicorn
-echo "Starting newsletter page app..."
-cd /app && gunicorn --bind 127.0.0.1:3001 Newsletter_page:app --timeout 120 > /var/log/newsletter_page.log 2> /var/log/newsletter_page.err.log &
 
 # Keep the container running
 echo "All services started. Container is now running..."

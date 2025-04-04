@@ -310,6 +310,9 @@
 
       <!-- JavaScript for handling forms via AJAX -->
       <script>
+        // Get the application root path from the server or default to what we know
+        const appRootPath = "{{ request.script_root }}" || "/ai/management";
+        
         // Called when user clicks a category button (for Preferences)
         function togglePreference(btn) {
           btn.classList.toggle("selected");
@@ -336,7 +339,7 @@
             // Optional debug
             console.log("[DEBUG]", formId, "submitting with:", [...formData.entries()]);
 
-            fetch("/", {
+            fetch(appRootPath, {
               method: "POST",
               headers: { "X-Requested-With": "XMLHttpRequest" },
               body: formData

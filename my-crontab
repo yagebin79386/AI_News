@@ -2,16 +2,22 @@
 # Test job - runs every minute
 
 # Run news scraper at 5:00 PM every Monday, Wednesday, and Friday
-0 20 * * 1,3,5 /usr/local/bin/python3 /app/ScraperNewsLLM.py >> /var/log/news_AI_scrape_app.log 2>&1
+0 20 * * 1,3,5 /usr/local/bin/python3 /app/ai/ScraperNewsLLM.py >> /var/log/ai/news_AI_scrape_app.log 2>&1
+10 20 * * 1,3,5 /usr/local/bin/python3 /app/crypto/ScraperNewsLLM.py >> /var/log/crypto/news_crypto_scrape_app.log 2>&1
 
 # Run categorization at 6:30 PM every Monday, Wednesday, and Friday
-10 20 * * 1,3,5 /usr/local/bin/python3 /app/categorizationLLM.py >> /var/log/news_AI_categorization_app.log 2>&1
+20 20 * * 1,3,5 /usr/local/bin/python3 /app/ai/categorizationLLM.py >> /var/log/ai/news_AI_categorization_app.log 2>&1
+28 20 * * 1,3,5 /usr/local/bin/python3 /app/crypto/categorizationLLM.py >> /var/log/crypto/news_crypto_categorization_app.log 2>&1
 
 # Run evaluation at 7:20 PM every Monday, Wednesday, and Friday
-20 20 * * 1,3,5 /usr/local/bin/python3 /app/evaluate_articles.py >> /var/log/news_AI_evaluation_app.log 2>&1
+35 20 * * 1,3,5 /usr/local/bin/python3 /app/ai/evaluate_articles.py >> /var/log/ai/news_AI_evaluation_app.log 2>&1
+40 20 * * 1,3,5 /usr/local/bin/python3 /app/crypto/evaluate_articles.py >> /var/log/crypto/news_crypto_evaluation_app.log 2>&1
 
-# Generate newsletter at 7:30 PM every Monday, Wednesday, and Friday
-22 20 * * 1,3,5 /usr/local/bin/python3 /app/generate_newsletter.py >> /var/log/news_AI_generate_app.log 2>&1
+# Generate AI newsletter at 7:30 PM every Monday, Wednesday, and Friday
+45 20 * * 1,3,5 /usr/local/bin/python3 /app/ai/generate_newsletter.py >> /var/log/ai/generate_newsletter.log 2>&1
+48 20 * * 1,3,5 /usr/local/bin/python3 /app/crypto/generate_newsletter.py >> /var/log/crypto/generate_crypto_newsletter.log 2>&1
 
-# Send newsletter at 8:00 PM every Monday, Wednesday, and Friday
-25 20 * * 1,3,5 /usr/local/bin/python3 /app/Newsletter_send.py >> /var/log/news_AI_send_app.log 2>&1 
+
+# Send newsletter at 8:05 PM every Monday, Wednesday, and Friday
+50 20 * * 1,3,5 /usr/local/bin/python3 /app/ai/Newsletter_send.py >> /var/log/ai/newsletter_AI_send.log 2>&1 
+0 21 * * 1,3,5 /usr/local/bin/python3 /app/crypto/Newsletter_send.py >> /var/log/crypto/newsletter_crypto_send.log 2>&1 

@@ -1,5 +1,5 @@
 -- News table
-CREATE TABLE IF NOT EXISTS news (
+CREATE TABLE IF NOT EXISTS crypto_news (
     news_id SERIAL PRIMARY KEY,
     Title TEXT UNIQUE,
     Author TEXT,
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS news (
 );
 
 -- Newsletter table
-CREATE TABLE IF NOT EXISTS newsletter (
+CREATE TABLE IF NOT EXISTS crypto_newsletter (
     newsletter_id SERIAL PRIMARY KEY,
     newsletter_title TEXT UNIQUE,
     broadcast_date TEXT,
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS newsletter (
 );
 
 -- Subscriber table
-CREATE TABLE IF NOT EXISTS subscriber (
+CREATE TABLE IF NOT EXISTS crypto_subscriber (
     subscriber_id SERIAL PRIMARY KEY,
     email TEXT NOT NULL UNIQUE,
     creation_time TEXT,

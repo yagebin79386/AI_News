@@ -138,7 +138,9 @@ app.config['APPLICATION_ROOT'] = '/crypto/management'
 app.config['PREFERRED_URL_SCHEME'] = 'https'
 
 # This fixes the "Contradictory scheme headers" issue
-app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1, x_prefix=1)
+
+print(f"[INFO] Application starting with APPLICATION_ROOT={app.config.get('APPLICATION_ROOT')}")
 
 # Create database manager using environment variables
 db_manager = DatabaseManager()
@@ -154,6 +156,19 @@ def health_check():
     except Exception as e:
         print(f"Health check failed: {e}")
         return jsonify({"status": "unhealthy", "error": str(e)}), 500
+
+@app.route("/debug")
+def debug_info():
+    """Debug information about the request"""
+    return jsonify({
+        "script_root": request.script_root,
+        "base_url": request.base_url,
+        "url": request.url,
+        "path": request.path,
+        "headers": dict(request.headers),
+        "app_root": app.config.get('APPLICATION_ROOT'),
+        "preferred_scheme": app.config.get('PREFERRED_URL_SCHEME')
+    })
 
 @app.route("/", methods=["GET", "POST"])
 def subscribe_management():

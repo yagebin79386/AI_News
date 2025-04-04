@@ -241,6 +241,9 @@
 
       <!-- JavaScript for handling forms via AJAX -->
       <script>
+        // Get the application root path from the server or default to what we know
+        const appRootPath = "{{ request.script_root }}" || "/crypto/management";
+        
         // Called when user clicks a category button (for Preferences)
         function togglePreference(btn) {
           btn.classList.toggle("selected");
@@ -267,7 +270,7 @@
             // Optional debug
             console.log("[DEBUG]", formId, "submitting with:", [...formData.entries()]);
 
-            fetch("/", {
+            fetch(appRootPath, {
               method: "POST",
               headers: { "X-Requested-With": "XMLHttpRequest" },
               body: formData
@@ -428,8 +431,8 @@
                   {% if subscriber_info.crypto_involvement == "Yes, actively investing/trading" %}selected{% endif %}>Yes, actively investing/trading</option>
                 <option value="Yes, as a casual investor" 
                   {% if subscriber_info.crypto_involvement == "Yes, as a casual investor" %}selected{% endif %}>Yes, as a casual investor</option>
-                <option value="No, but I’m interested in learning more" 
-                  {% if subscriber_info.crypto_involvement == "No, but I’m interested in learning more" %}selected{% endif %}>No, but I’m interested in learning more</option>
+                <option value="No, but I'm interested in learning more" 
+                  {% if subscriber_info.crypto_involvement == "No, but I'm interested in learning more" %}selected{% endif %}>No, but I'm interested in learning more</option>
                 <option value="No, not at all" 
                   {% if subscriber_info.crypto_involvement == "No, not at all" %}selected{% endif %}>No, not at all</option>
               </select>

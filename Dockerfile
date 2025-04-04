@@ -45,22 +45,24 @@ RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
 RUN ln -sf /usr/local/bin/python3 /usr/local/bin/python
 
 # Create log directories and files
-RUN mkdir -p /var/log/news_AI && \
-    touch /var/log/news_AI_scrape_app.log && chmod 644 /var/log/news_AI_scrape_app.log && \
-    touch /var/log/news_AI_categorization_app.log && chmod 644 /var/log/news_AI_categorization_app.log && \
-    touch /var/log/news_AI_evaluation_app.log && chmod 644 /var/log/news_AI_evaluation_app.log && \
-    touch /var/log/news_AI_generate_app.log && chmod 644 /var/log/news_AI_generate_app.log && \
-    touch /var/log/news_AI_send_app.log && chmod 644 /var/log/news_AI_send_app.log && \
-    touch /var/log/supercronic.log && chmod 644 /var/log/supercronic.log && \
-    touch /var/log/nginx.log && chmod 644 /var/log/nginx.log && \
-    touch /var/log/nginx.err.log && chmod 644 /var/log/nginx.err.log && \
-    touch /var/log/subscriber_mgt.log && chmod 644 /var/log/subscriber_mgt.log && \
-    touch /var/log/subscriber_mgt.err.log && chmod 644 /var/log/subscriber_mgt.err.log && \
-    touch /var/log/newsletter_page.log && chmod 644 /var/log/newsletter_page.log && \
-    touch /var/log/newsletter_page.err.log && chmod 644 /var/log/newsletter_page.err.log
+RUN mkdir -p /var/log
 
-# Copy all project files into the container
-COPY . .
+# Copy app folders structure
+COPY news_ai/ /app/news_ai/
+COPY news_crypto/ /app/news_crypto/
+
+# Make sure start.sh files are executable
+RUN chmod +x /app/news_ai/start.sh
+RUN chmod +x /app/news_crypto/start.sh
+
+# Copy root level files
+COPY Dockerfile /app/
+COPY fly.toml /app/
+COPY README.md /app/
+COPY requirements.txt /app/
+COPY setup_domain.sh /app/
+COPY setup_postgres.sql /app/
+COPY templates/ /app/templates/
 
 # Make all Python scripts executable
 RUN find /app -name "*.py" -exec chmod +x {} \;
@@ -89,25 +91,43 @@ server {
     proxy_set_header X-Forwarded-Proto \$http_x_forwarded_proto;
 
     # Management app routing
-    location /management {
+    location /ai/management {
         proxy_pass http://127.0.0.1:3000/;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto \$http_x_forwarded_proto;
-        proxy_set_header X-Script-Name /management;
+        proxy_set_header X-Script-Name /ai/management;
+    }
+
+    location /crypto/management {
+        proxy_pass http://127.0.0.1:3002/;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$http_x_forwarded_proto;
+        proxy_set_header X-Script-Name /crypto/management;
     }
 
     # Newsletter app routing - pass everything after /newsletter/
-    location ~ ^/newsletter(/.*|$) {
+    location ~ ^/ai/newsletter(/.*|$) {
         proxy_pass http://127.0.0.1:3001\$1;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto \$http_x_forwarded_proto;
-        proxy_set_header X-Script-Name /newsletter;
+        proxy_set_header X-Script-Name /ai/newsletter;
     }
     
+    location ~ ^/crypto/newsletter(/.*|$) {
+        proxy_pass http://127.0.0.1:3003\$1;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$http_x_forwarded_proto;
+        proxy_set_header X-Script-Name /crypto/newsletter;
+    }
+
     # Health check route for the deployment
     location = /health {
         return 200 'OK';
@@ -131,11 +151,11 @@ EOF
 RUN ln -s /etc/nginx/sites-available/news_ai /etc/nginx/sites-enabled/
 
 # Make sure start.sh is executable
-COPY start.sh /app/start.sh
-RUN chmod +x /app/start.sh
+COPY app_start.sh /app/app_start.sh
+RUN chmod +x /app/app_start.sh
 
 # Expose the main port
 EXPOSE 8085
 
 # Use start.sh as the container entry point
-CMD ["/app/start.sh"]
+CMD ["/app/app_start.sh"]
