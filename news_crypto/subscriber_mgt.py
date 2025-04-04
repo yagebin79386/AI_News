@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 from datetime import datetime
 from Welcome_send import send_welcome_email_to_user 
+from Management_send import send_subs_management_email_to_user
 import psycopg2
 import psycopg2.extras
 import os
@@ -36,25 +37,44 @@ class DatabaseManager:
         else:
             self.db_config = db_config
             
-        self.conn = psycopg2.connect(
-            dbname=self.db_config["dbname"],
-            user=self.db_config["user"],
-            password=self.db_config["password"],
-            host=self.db_config["host"],
-            cursor_factory=psycopg2.extras.RealDictCursor
-        )
+        self._get_connection()
+
+    def _get_connection(self):
+        try:
+            self.conn = psycopg2.connect(
+                dbname=self.db_config["dbname"],
+                user=self.db_config["user"],
+                password=self.db_config["password"],
+                host=self.db_config["host"],
+                cursor_factory=psycopg2.extras.RealDictCursor
+            )
+        except Exception as e:
+            print(f"Database connection error: {e}")
+            raise
         self.current_time = datetime.now().isoformat()
 
+    def _ensure_connection(self):
+        try:
+            # Test if connection is still alive
+            self.conn.cursor().execute('SELECT 1')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            # If connection is dead, create a new one
+            self._get_connection()
+
     def get_subscriber(self, email):
-        conn = self.conn
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM crypto_subscriber WHERE email = %s", (email,))
-        row = cursor.fetchone()
-        cursor.close()
-        print(f"[DEBUG] get_subscriber({email}) returned: {row}")
-        if row:
-            return self.parse_subscriber(row)
-        return None
+        try:
+            self._ensure_connection()
+            cursor = self.conn.cursor()
+            cursor.execute("SELECT * FROM crypto_subscriber WHERE email = %s", (email,))
+            row = cursor.fetchone()
+            cursor.close()
+            print(f"[DEBUG] get_subscriber({email}) returned: {row}")
+            if row:
+                return self.parse_subscriber(row)
+            return None
+        except Exception as e:
+            print(f"Error in get_subscriber: {e}")
+            raise
 
     def parse_subscriber(self, row):
         """
@@ -77,7 +97,7 @@ class DatabaseManager:
         }
 
     def add_subscriber(self, email):
-        
+        self._ensure_connection()
         conn = self.conn
         cursor = conn.cursor()
         cursor.execute(
@@ -88,6 +108,7 @@ class DatabaseManager:
         cursor.close()
 
     def delete_subscriber(self, email):
+        self._ensure_connection()
         conn = self.conn
         cursor = conn.cursor()
         cursor.execute("DELETE FROM crypto_subscriber WHERE email = %s", (email,))
@@ -95,6 +116,7 @@ class DatabaseManager:
         cursor.close()
 
     def update_preferences(self, email, preferences):
+        self._ensure_connection()
         conn = self.conn
         cursor = conn.cursor()
         cursor.execute(
@@ -107,6 +129,7 @@ class DatabaseManager:
     def update_general_info(self, email, age_range, gender, residence_country, annual_income, crypto_involvement):
         print(f"[DEBUG] update_general_info() for {email}: age_range={age_range}, gender={gender}, "
               f"residence_country={residence_country}, annual_income={annual_income}, crypto_involvement={crypto_involvement}")
+        self._ensure_connection()
         conn = self.conn
         cursor = conn.cursor()
         cursor.execute(
@@ -151,7 +174,7 @@ def health_check():
     """Simple health check endpoint for monitoring systems"""
     try:
         # Verify database connection is working
-        db_manager.conn.cursor().execute('SELECT 1')
+        db_manager._ensure_connection()
         return jsonify({"status": "healthy", "service": "subscriber_management"}), 200
     except Exception as e:
         print(f"Health check failed: {e}")
@@ -197,6 +220,13 @@ def subscribe_management():
                     email_status = "This Email is already registered with Newsletter, please check your email Box."
                     subscriber_info = None
                     is_verified = False
+                    
+                    # Attempt to send subs_management email
+                    try:
+                        send_subs_management_email_to_user(email)
+                    except Exception as e:
+                        print(f"[ERROR] Failed to send subs_management email: {e}")
+                        email_status = "This Email is already registered with Newsletter but failed to send management email."
                 else:
                     # Insert new subscriber           
                     db_manager.add_subscriber(email)
@@ -541,8 +571,18 @@ def subscribe_management():
         ]
         )
     except Exception as e:
-        print(f"Error in subscribe_management: {e}")
-        return jsonify({"status": "error", "error": str(e)}), 500
+        print(f"Unexpected error in subscribe_management: {e}")
+        return render_template(
+            "subscribe_management.html",
+            email="",
+            is_verified=False,
+            subscriber_info=None,
+            email_status="An unexpected error occurred. Please try again later.",
+            pref_status="",
+            general_status="",
+            preference_options=[],
+            all_countries=[]
+        )
 
 if __name__ == "__main__":
     try:
