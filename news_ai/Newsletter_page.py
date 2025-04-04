@@ -6,6 +6,7 @@ import os
 from dotenv import load_dotenv
 from urllib.parse import urlparse
 import logging
+import re
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 # Configure logging
@@ -83,6 +84,22 @@ def index():
     </html>
     """
 
+def modify_html_for_web(html):
+    """
+    Modify the newsletter HTML for web viewing.
+    Specifically, replace the email-specific subscription text with web-appropriate text.
+    """
+    # Pattern to match the subscription container div with the email-specific text
+    pattern = r'<div class="subscribe-container">\s*Update your email preferences or unsubscribe\s*<a href="[^"]*" target="_blank" rel="noopener nofollow">here</a>\.\s*</div>'
+    
+    # Replacement with web-appropriate text
+    replacement = '<div class="subscribe-container">You can subscribe through <a href="https://www.ainewsletter.homesmartify.lu/ai/management" target="_blank" rel="noopener nofollow">this link</a>.</div>'
+    
+    # Replace the pattern in the HTML
+    modified_html = re.sub(pattern, replacement, html)
+    
+    return modified_html
+
 # Route for viewing a specific newsletter
 @app.route("/<int:newsletter_id>", methods=["GET"])
 def display_newsletter(newsletter_id):
@@ -106,9 +123,13 @@ def display_newsletter(newsletter_id):
             return f"Newsletter {newsletter_id} not found", 404
             
         newsletter_html = result[0]
-        logger.debug(f"Successfully retrieved newsletter {newsletter_id}")
         
-        # Return the HTML directly
+        # Modify the HTML for web viewing
+        newsletter_html = modify_html_for_web(newsletter_html)
+        
+        logger.debug(f"Successfully retrieved and modified newsletter {newsletter_id} for web viewing")
+        
+        # Return the modified HTML directly
         return newsletter_html
         
     except Exception as e:
