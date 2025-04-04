@@ -93,7 +93,7 @@ def modify_html_for_web(html):
     pattern = r'<div class="subscribe-container">\s*Update your email preferences or unsubscribe\s*<a href="[^"]*" target="_blank" rel="noopener nofollow">here</a>\.\s*</div>'
     
     # Replacement with web-appropriate text
-    replacement = '<div class="subscribe-container">You can subscribe through <a href="https://www.cryptonewsletter.homesmartify.lu/crypto/management" target="_blank" rel="noopener nofollow">this link</a>.</div>'
+    replacement = '<div class="subscribe-container">You can subscribe through <a href="https://www.ainewsletter.homesmartify.lu/crypto/management" target="_blank" rel="noopener nofollow">this link</a>.</div>'
     
     # Replace the pattern in the HTML
     modified_html = re.sub(pattern, replacement, html)
