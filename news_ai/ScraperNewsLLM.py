@@ -493,7 +493,7 @@ if __name__ == "__main__":
     if not os.environ.get("OPENAI_API_KEY"):
         print("❌ OPENAI_API_KEY environment variable not set. News extraction will fail.")
     
-    base_url = ["https://futureoflife.org", "https://www.technologyreview.com", "https://www.wired.com/tag/artificial-intelligence/", "https://www.deeplearning.ai/the-batch/", "https://montrealethics.ai", "https://venturebeat.com/category/ai/", "https://www.artificialintelligence-news.com", "https://www.reuters.com/technology/artificial-intelligence/"]
+    base_url = ["https://siliconangle.com/category/ai/", "https://www.technologyreview.com", "https://www.wired.com/tag/artificial-intelligence/", "https://www.deeplearning.ai/the-batch/", "https://montrealethics.ai", "https://venturebeat.com/category/ai/", "https://www.artificialintelligence-news.com", "https://www.reuters.com/technology/artificial-intelligence/", "https://www.reuters.com/technology/artificial-intelligence/"]
     db_url = os.environ.get("DATABASE_URL")
     if not db_url:
         print("❌ DATABASE_URL environment variable not set.")
