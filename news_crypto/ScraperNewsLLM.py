@@ -518,7 +518,7 @@ if __name__ == "__main__":
     if not os.environ.get("OPENAI_API_KEY"):
         print("❌ OPENAI_API_KEY environment variable not set. News extraction will fail.")
     
-    base_url = ["https://cointelegraph.com", "https://decrypt.co", "https://bitcoinmagazine.com", "https://cryptoslate.com"]
+    base_url = ["https://cointelegraph.com", "https://decrypt.co", "https://bitcoinmagazine.com", "https://cryptoslate.com", "https://www.coindesk.com", "https://www.bloomberg.com/crypto"]
     db_url = os.environ.get("DATABASE_URL")
     if not db_url:
         print("❌ DATABASE_URL environment variable not set.")

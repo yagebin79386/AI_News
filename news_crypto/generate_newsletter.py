@@ -21,7 +21,7 @@ class NewsletterGenerator:
       4) Render the newsletter HTML from DB data (so no repeated LLM calls).
     """
 
-    def __init__(self, db_config=None, days_from_now: int = 7, api_key=None):
+    def __init__(self, db_config=None, days_from_now: int = 2, api_key=None):
         """
         Initialize the NewsletterGenerator with database configuration and time range.
         
