@@ -398,6 +398,7 @@ class NewsScrapperGeneral:
         scrape the main article text from the Link using Newspaper3k, and update the record.
         The scraped main text is saved under the 'article' column, and if Author or Publication_Date
         are missing, they are updated as well.
+        If the article content cannot be retrieved, the row will be deleted from the database.
         """
         config = Config()
         config.browser_user_agent = (
@@ -423,6 +424,13 @@ class NewsScrapperGeneral:
                 main_text = art.text
                 scraped_author = ", ".join(art.authors) if art.authors else db_author
                 scraped_pub_date = art.publish_date.isoformat() if art.publish_date else db_pub_date
+                
+                # Check if we successfully retrieved the article content
+                if not main_text or main_text.strip() == "":
+                    print(f"❌ No content retrieved for article: {title}. Deleting row.")
+                    c.execute("DELETE FROM news WHERE Title = %s", (title,))
+                    continue
+                    
                 update_sql = """
                 UPDATE news 
                 SET article = %s, Author = COALESCE(%s, Author),
@@ -430,9 +438,10 @@ class NewsScrapperGeneral:
                 WHERE Title = %s;
                 """
                 c.execute(update_sql, (main_text, scraped_author, scraped_pub_date, title))
-                print(f"Updated details for article: {title}")
+                print(f"✅ Updated details for article: {title}")
             except Exception as e:
-                print(f"Error scraping article at {link}: {e}")
+                print(f"❌ Error scraping article at {link}: {e}. Deleting row.")
+                c.execute("DELETE FROM news WHERE Title = %s", (title,))
         conn.commit()
         print("✅ Article details updated in the database.")
 

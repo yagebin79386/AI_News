@@ -423,6 +423,7 @@ class NewsScrapperGeneral:
         scrape the main article text from the Link using Newspaper3k, and update the record.
         The scraped main text is saved under the 'article' column, and if Author or Publication_Date
         are missing, they are updated as well.
+        If the article text cannot be retrieved successfully, the record will be dropped from the database.
         """
         config = Config()
         config.browser_user_agent = (
@@ -446,6 +447,15 @@ class NewsScrapperGeneral:
                 art.download()
                 art.parse()
                 main_text = art.text
+                
+                # Verify if the article text was successfully retrieved
+                if not main_text or len(main_text.strip()) < 50:  # Minimum length check
+                    print(f"❌ Article text retrieval failed for: {title}")
+                    # Drop the record if text retrieval failed
+                    c.execute("DELETE FROM crypto_news WHERE Title = %s", (title,))
+                    print(f"Deleted record for article: {title}")
+                    continue
+                
                 scraped_author = ", ".join(art.authors) if art.authors else db_author
                 scraped_pub_date = art.publish_date.isoformat() if art.publish_date else db_pub_date
                 update_sql = """
@@ -455,9 +465,12 @@ class NewsScrapperGeneral:
                 WHERE Title = %s;
                 """
                 c.execute(update_sql, (main_text, scraped_author, scraped_pub_date, title))
-                print(f"Updated details for article: {title}")
+                print(f"✅ Updated details for article: {title}")
             except Exception as e:
-                print(f"Error scraping article at {link}: {e}")
+                print(f"❌ Error scraping article at {link}: {e}")
+                # Drop the record if scraping failed
+                c.execute("DELETE FROM crypto_news WHERE Title = %s", (title,))
+                print(f"Deleted record for article: {title}")
         conn.commit()
         print("✅ Article details updated in the database.")
 
