@@ -1,7 +1,9 @@
 # AI Newsletter
 
 This application automatically scrambles relevant news and uses LLM assistance for news categorization, rephrasing, and selection.
-![Newsletter Operation](https://github.com/yagebin79386/AI_News/blob/main/assets/Newsletter_operation.gif?raw=true)
+
+![Newsletter Operation](https://raw.githubusercontent.com/yagebin79386/AI_News/main/assets/Newsletter_operation.gif)
+
 ## Features
 
 - **News Scraping**: Automatically scrapes the latest news articles.
