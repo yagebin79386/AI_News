@@ -1,7 +1,7 @@
-# SmartHome_Newsletter
+# AI Newsletter
 
 This application automatically scrambles relevant news and uses LLM assistance for news categorization, rephrasing, and selection.
-
+![Newsletter Operation](https://github.com/yagebin79386/AI_News/blob/main/assets/Newsletter_operation.gif?raw=true)
 ## Features
 
 - **News Scraping**: Automatically scrapes the latest news articles.
