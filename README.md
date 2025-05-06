@@ -43,14 +43,6 @@ The project uniquely fuses traditional techniques with modern AI methodologies. 
 - **Dynamic Content Categorization:** AI models classify and rephrase articles, ensuring that the newsletter is both engaging and tailored to the interests of crypto and blockchain readers.
 - **Enhanced User Experience:** An independently designed, responsive frontend provides subscribers with an intuitive interface for managing their subscriptions and content preferences.
 
-## Features
-
-- **News Scraping:** Automatically scrapes the latest news articles.
-- **Categorization:** Utilizes LLM for categorizing news articles.
-- **Newsletter Generation:** Generates newsletters based on selected articles.
-- **Automated Scheduling:** Uses cron jobs to automate tasks.
->>>>>>> 1ada6fd61a12a7ae3a0809c56bd9f8db25b46474
-
 ## Installation
 
 1. **Clone the repository**:
@@ -123,4 +115,4 @@ Newsletter_send.py: Sends newsletters.
 - **Domain Setup:**
   Use the setup_domain.sh script to manage domains and SSL certificates.
   Add domains manually via the Fly.io dashboard if needed.
->>>>>>> 1ada6fd61a12a7ae3a0809c56bd9f8db25b46474
+
