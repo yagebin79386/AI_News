@@ -2,7 +2,7 @@
 
 This application automatically scrambles relevant news and uses LLM assistance for news categorization, rephrasing, and selection.
 
-![Newsletter Operation](https://raw.githubusercontent.com/yagebin79386/AI_News/main/assets/Newsletter_operation.gif)
+![Newsletter Operation](https://github.com/yagebin79386/AI_News/blob/ff6a3c911578b003989028da76ca2c3fa658c734/assets/AI_Newsletter.gif))
 
 ## Features
 
